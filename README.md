@@ -15,7 +15,10 @@ It is designed to detect undocumented functions, pass the function to an AI prov
 - Make AI providers more extensible (define a protocol of what an AI provider should do).
   - request callback
   - response callback (basically get a plain string with the docs so the task can parse it as AST).
-- Simple check if the string of the body its in the correct format ```elixir "@doc \"\"\"" <> string = docs```
+- Simple check if the string of the body its in the correct format
+```elixir
+ "@doc \"\"\"" <> string = docs
+```
 - Make an option to give a customizable prompt.
 - Make an option to give path pattern customizable.
 - Make some tests.
