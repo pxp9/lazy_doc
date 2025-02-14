@@ -17,13 +17,15 @@ defmodule LazyDoc do
   end
 
   @doc """
-    
+
   Parameters
 
-  None
+  - None
   Description
+   Prints "Hello world" to the standard output.
 
-  Prints "Hello world" to the console.
+  Returns
+   None
 
   """
   def func_without_doc(), do: IO.puts("Hello world")

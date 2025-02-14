@@ -19,7 +19,6 @@ It is designed to detect undocumented functions, pass the function to an AI prov
 ```elixir
  "@doc \"\"\"" <> string = docs
 ```
-- Make an option to give a customizable prompt.
 - Make an option to give path pattern customizable.
 - Make some tests.
 

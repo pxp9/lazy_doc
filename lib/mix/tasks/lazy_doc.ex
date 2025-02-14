@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.LazyDoc do
   use Mix.Task
 
-  @prompt "You should describe the parameters based on the spec given and give a small description of the following function.\n\nPlease do it in the following format given as an example, important do not return the header of the function, do not return a explanation of the function, your output must be only the docs in the following format.\n\n@doc \"\"\"\n\nParameters\n\ntransaction_id - foreign key of the Transactions table.\nDescription\n\nReturns the Transaction corresponding to transaction_id\n\n\"\"\"\n\nFunction to document:\n"
+  @default_function_prompt "You should describe the parameters based on the spec given and give a small description of the following function.\n\nPlease do it in the following format given as an example, important do not return the header of the function, do not return a explanation of the function, your output must be only the docs in the following format.\n\n@doc \"\"\"\n\nParameters\n\ntransaction_id - foreign key of the Transactions table.\nDescription\n\nReturns the Transaction corresponding to transaction_id\n\n\"\"\"\n\nFunction to document:\n"
 
   def run(_command_line_args) do
     ## Start req
@@ -9,7 +9,6 @@ defmodule Mix.Tasks.LazyDoc do
     _result = Req.Application.start("", "")
 
     _result = LazyDoc.Application.start("", "")
-
 
     {provider, model} = Application.get_env(:lazy_doc, :provider)
 
@@ -104,7 +103,10 @@ defmodule Mix.Tasks.LazyDoc do
 
     {function_atom, function_stringified} = Enum.at(entry.functions, 0) |> elem(1)
 
-    function_prompt = @prompt <> function_stringified
+    final_prompt =
+      Application.get_env(:lazy_doc, :custom_function_prompt, @default_function_prompt)
+
+    function_prompt = final_prompt <> function_stringified
     IO.inspect(function_prompt)
 
     response = request_prompt(function_prompt, provider, model_text, token)
@@ -208,7 +210,6 @@ defmodule Mix.Tasks.LazyDoc do
   defp extract_names({_whatever, _meta, _children}, acc) do
     acc
   end
- 
 
   defp github_models(model) do
     case model do
