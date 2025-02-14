@@ -16,5 +16,17 @@ defmodule LazyDoc do
     :world
   end
 
+  @doc """
+
+  Parameters
+
+  None
+  Description
+   Outputs "Hello world" to the console.
+
+  Returns
+   None
+
+  """
   def func_without_doc(), do: IO.puts("Hello world")
 end
