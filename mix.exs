@@ -9,9 +9,21 @@ defmodule LazyDoc.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: "A Mix task for documenting your projects with AI",
-      links: %{Github: "https://github.com/pxp9/lazy_doc"},
-      licenses: [:MIT]
+      package: package()
     ]
+  end
+
+  defp package() do
+    [
+      name: "lazy_doc",
+      maintainers: ["Pepe Marquez"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => github_link()}
+    ]
+  end
+
+  defp github_link() do
+    "https://github.com/pxp9/lazy_doc"
   end
 
   # Run "mix help compile.app" to learn about applications.
@@ -27,7 +39,8 @@ defmodule LazyDoc.MixProject do
     [
       {:dotenv, "~> 3.0.0", only: [:dev]},
       {:req, "~> 0.4.0"},
-      {:jason, "~> 1.0"}
+      {:jason, "~> 1.0"},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 end
