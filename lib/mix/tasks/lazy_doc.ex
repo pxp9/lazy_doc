@@ -19,9 +19,9 @@ defmodule Mix.Tasks.LazyDoc do
   def run(_command_line_args) do
     ## Start req
 
-    _result = Req.Application.start("", "")
+    _result = Application.ensure_started(:req)
 
-    _result = LazyDoc.Application.start("", "")
+    _result = Application.ensure_started(:lazy_doc)
 
     {provider, model} = Application.get_env(:lazy_doc, :provider)
     model_text = models(provider, model)
