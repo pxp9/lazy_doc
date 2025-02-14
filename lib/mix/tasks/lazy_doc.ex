@@ -2,8 +2,20 @@ defmodule Mix.Tasks.LazyDoc do
   require Logger
   use Mix.Task
 
-  @default_function_prompt "You should describe the parameters based on the spec given and give a small description of the following function.\n\nPlease do it in the following format given as an example, important do not return the header of the function, do not return a explanation of the function, your output must be only the docs in the following format.\n\n@doc \"\"\"\n\nParameters\n\ntransaction_id - foreign key of the Transactions table.\nDescription\n\nReturns the Transaction corresponding to transaction_id\n\n\"\"\"\n\nFunction to document:\n"
+  @default_function_prompt "You should describe the parameters based on the spec given and give a small description of the following function.\n\nPlease do it in the following format given as an example, important do not return the header of the function, do not return a explanation of the function, your output must be only the docs in the following format.\n\n@doc \"\"\"\n\nParameters\n\ntransaction_id - foreign key of the Transactions table.\nDescription\n Performs a search in the database\n\nReturns\n the Transaction corresponding to transaction_id\n\n\"\"\"\n\nFunction to document:\n"
 
+  @doc """
+
+  Parameters
+
+  _command_line_args - command line arguments provided to the function.
+  Description
+   Runs the main application logic for the LazyDoc utility, processing source files to extract documentation.
+
+  Returns
+   None
+
+  """
   def run(_command_line_args) do
     ## Start req
 
@@ -129,8 +141,6 @@ defmodule Mix.Tasks.LazyDoc do
                 IO.puts("Cannot parse the response as an Elixir AST: #{inspect(reason)}")
                 acc_ast
             end
-
-            ## TO_DO: change this to entry.file
           else
             Logger.error(
               "docs are in a wrong format review your model #{model} or your prompt\n\n this was returned by the AI: #{docs}"
@@ -138,7 +148,7 @@ defmodule Mix.Tasks.LazyDoc do
           end
         end)
 
-      write_to_file_formatted("hello.ex", ast_acc, entry.comments)
+      write_to_file_formatted(entry.file, ast_acc, entry.comments)
     end)
   end
 
@@ -163,6 +173,18 @@ defmodule Mix.Tasks.LazyDoc do
     |> Req.post!()
   end
 
+  @doc """
+
+  Parameters
+
+  ast - an abstract syntax tree (AST) structure representing the source code.
+  Description
+   Initiates the extraction of names from the given AST.
+
+  Returns
+   a list of names extracted from the AST.
+
+  """
   def extract_names(ast) do
     extract_names(ast, [])
   end
