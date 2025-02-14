@@ -21,6 +21,7 @@ defmodule LazyDoc do
   Parameters
 
   None
+
   Description
    Outputs "Hello world" to the console.
 

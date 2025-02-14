@@ -1,4 +1,5 @@
 defmodule Mix.Tasks.LazyDoc do
+  require Logger
   use Mix.Task
 
   @default_function_prompt "You should describe the parameters based on the spec given and give a small description of the following function.\n\nPlease do it in the following format given as an example, important do not return the header of the function, do not return a explanation of the function, your output must be only the docs in the following format.\n\n@doc \"\"\"\n\nParameters\n\ntransaction_id - foreign key of the Transactions table.\nDescription\n\nReturns the Transaction corresponding to transaction_id\n\n\"\"\"\n\nFunction to document:\n"
@@ -115,23 +116,31 @@ defmodule Mix.Tasks.LazyDoc do
 
     docs = get_docs_from_response(response)
 
-    result =
-      Code.string_to_quoted_with_comments(docs,
-        literal_encoder: &{:ok, {:__block__, &2, [&1]}},
-        token_metadata: true,
-        unescape: false
+    ok? = docs_are_ok?(docs)
+
+    if ok? do
+      result =
+        Code.string_to_quoted_with_comments(docs,
+          literal_encoder: &{:ok, {:__block__, &2, [&1]}},
+          token_metadata: true,
+          unescape: false
+        )
+
+      case result do
+        {:ok, node, _} ->
+          IO.inspect(node)
+
+          new_ast = insert_doc_for_function(entry.ast, function_atom, node)
+
+          write_to_file_formatted("hello.ex", new_ast, entry.comments)
+
+        {:error, reason} ->
+          IO.puts("Cannot parse the response as an Elixir AST: #{inspect(reason)}")
+      end
+    else
+      Logger.error(
+        "docs are in a wrong format review your model #{model} or your prompt\n\n this was returned by the AI: #{docs}"
       )
-
-    case result do
-      {:ok, node, _} ->
-        IO.inspect(node)
-
-        new_ast = insert_doc_for_function(entry.ast, function_atom, node)
-
-        write_to_file_formatted("hello.ex", new_ast, entry.comments)
-
-      {:error, reason} ->
-        IO.puts("Cannot parse the response as an Elixir AST: #{inspect(reason)}")
     end
   end
 
@@ -230,6 +239,10 @@ defmodule Mix.Tasks.LazyDoc do
     ## Take always first choice
     message = Enum.at(map["choices"], 0)["message"]["content"]
     message
+  end
+
+  def docs_are_ok?(docs) when is_binary(docs) do
+    match?("@doc \" " <> _, docs) or match?("@doc \"\"\"\n" <> _, docs)
   end
 
   @doc """

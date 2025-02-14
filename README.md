@@ -17,14 +17,6 @@ provider which is a tuple of two elements `{:github, :codestral}`.
   - request callback
   - response callback (basically get a plain string with the docs so the task
     can parse it as AST).
-- Simple check if the string of the body its in the correct format
-
-<!-- end list -->
-
-``` elixir
- "@doc \"\"\"" <> string = docs
-```
-
 - Make some tests.
 
 ## Installation
