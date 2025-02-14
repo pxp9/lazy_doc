@@ -7,9 +7,6 @@ provider which is a tuple of two elements `{:github, :codestral}`.
 
 ## Roadmap
 
-- Currently the mix task only takes the first function for the first module,
-  take all the functions for all modules given a pattern.
-- Prevent crashing if the module does not contain any function to document.
 - Make AI docs for modules as well, `@module_doc`.
 - Inspect the `defimpl` and `defprotocol` nodes.
 - Make AI providers more extensible (define a protocol of what an AI provider

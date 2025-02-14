@@ -17,13 +17,12 @@ defmodule LazyDoc do
   end
 
   @doc """
-
+    
   Parameters
 
   None
-
   Description
-   Outputs "Hello world" to the console.
+   Outputs "Hello world" to the console
 
   Returns
    None

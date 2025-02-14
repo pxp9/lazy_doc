@@ -12,136 +12,134 @@ defmodule Mix.Tasks.LazyDoc do
     _result = LazyDoc.Application.start("", "")
 
     {provider, model} = Application.get_env(:lazy_doc, :provider)
+    model_text = models(provider, model)
+
+    final_prompt =
+      Application.get_env(:lazy_doc, :custom_function_prompt, @default_function_prompt)
 
     ## Runs the runtime.exs from the client
     Mix.Task.run("app.config")
 
     token = Application.get_env(:lazy_doc, :token)
 
-    path_wildcard = Application.get_env(:lazy_doc, :path_wilcard, "lib/**/*.ex")
+    path_wildcard = Application.get_env(:lazy_doc, :path_wildcard, "lib/**/*.ex")
 
-    files =
-      Path.wildcard(path_wildcard)
-      |> Enum.map(fn file ->
-        # this task is for dev purposes so if we do not have a success reading a file is weird.
-        {:ok, content} = File.read(file)
+    Path.wildcard(path_wildcard)
+    |> Enum.map(fn file ->
+      # this task is for dev purposes so if we do not have a success reading a file is weird.
+      {:ok, content} = File.read(file)
 
-        {:ok, ast, comments} =
-          Code.string_to_quoted_with_comments(content,
-            literal_encoder: &{:ok, {:__block__, &2, [&1]}},
-            token_metadata: true,
-            unescape: false
-          )
-
-        names = extract_names(ast)
-
-        modules =
-          Enum.filter(names, fn {whatever, _name} -> whatever == :module end)
-          |> Enum.map(fn {:module, name} -> {:module, Module.concat(name)} end)
-
-        ## fetch docs get the docs info from a module
-        # We should only get the function which does not contain any docs
-        # docs `:hidden` means the programmer put explicitly `@doc false`
-        # docs `map()` it means the is already a docs for this function.
-        # docs `:none` means the script should take this function and give it to the LLM.
-        docs_per_module =
-          Enum.map(modules, fn {:module, name} ->
-            {:docs_v1, annotation, beam_language, format, module_doc, metadata, function_docs} =
-              Code.fetch_docs(name)
-
-            ## get only the function docs which are :none
-            function_docs =
-              Enum.filter(function_docs, fn {{_kind, _name, _arity}, _ann, _signature, docs,
-                                             _meta} ->
-                docs == :none
-              end)
-
-            {:docs_v1, annotation, beam_language, format, module_doc, metadata, function_docs}
-          end)
-
-        all_none_function_docs =
-          Enum.reduce(docs_per_module, [], fn {:docs_v1, _annotation, _beam_language, _format,
-                                               _module_doc, _metadata, function_docs},
-                                              acc ->
-            function_docs ++ acc
-          end)
-
-        ## Basically filtering the functions just the non documented functions
-        functions =
-          Enum.filter(names, fn {whatever, _something} -> whatever == :function end)
-          |> Enum.filter(fn {:function, {name, _stringify}} ->
-            Enum.any?(all_none_function_docs, fn
-              {{:function, name_to_check, _arity}, _line, _signature, :none, %{}} ->
-                name == name_to_check
-
-              {_non_func_node, _line, [], :none, %{}} ->
-                false
-            end)
-          end)
-
-        %{
-          file: file,
-          content: content,
-          lines: String.split(content, "\n") |> Stream.map(&String.trim/1) |> Enum.with_index(),
-          ast: ast,
-          modules: modules,
-          functions: functions,
-          docs_per_module: docs_per_module,
-          comments: comments
-        }
-      end)
-
-    entry = Enum.at(files, 0)
-    _content = entry.content
-    _ast = entry.ast
-
-    # IO.inspect(ast)
-
-    IO.inspect(entry.modules)
-    IO.inspect(entry.docs_per_module)
-    IO.inspect(entry.functions)
-    IO.inspect(entry.lines)
-
-    model_text = models(provider, model)
-
-    {function_atom, function_stringified} = Enum.at(entry.functions, 0) |> elem(1)
-
-    final_prompt =
-      Application.get_env(:lazy_doc, :custom_function_prompt, @default_function_prompt)
-
-    function_prompt = final_prompt <> function_stringified
-    IO.inspect(function_prompt)
-
-    response = request_prompt(function_prompt, provider, model_text, token)
-
-    docs = get_docs_from_response(response)
-
-    ok? = docs_are_ok?(docs)
-
-    if ok? do
-      result =
-        Code.string_to_quoted_with_comments(docs,
+      {:ok, ast, comments} =
+        Code.string_to_quoted_with_comments(content,
           literal_encoder: &{:ok, {:__block__, &2, [&1]}},
           token_metadata: true,
           unescape: false
         )
 
-      case result do
-        {:ok, node, _} ->
-          IO.inspect(node)
+      names = extract_names(ast)
 
-          new_ast = insert_doc_for_function(entry.ast, function_atom, node)
+      modules =
+        Enum.filter(names, fn {whatever, _name} -> whatever == :module end)
+        |> Enum.map(fn {:module, name} -> {:module, Module.concat(name)} end)
 
-          write_to_file_formatted("hello.ex", new_ast, entry.comments)
+      ## fetch docs get the docs info from a module
+      # We should only get the function which does not contain any docs
+      # docs `:hidden` means the programmer put explicitly `@doc false`
+      # docs `map()` it means the is already a docs for this function.
+      # docs `:none` means the script should take this function and give it to the LLM.
+      docs_per_module =
+        Enum.map(modules, fn {:module, name} ->
+          {:docs_v1, annotation, beam_language, format, module_doc, metadata, function_docs} =
+            Code.fetch_docs(name)
 
-        {:error, reason} ->
-          IO.puts("Cannot parse the response as an Elixir AST: #{inspect(reason)}")
-      end
-    else
-      Logger.error(
-        "docs are in a wrong format review your model #{model} or your prompt\n\n this was returned by the AI: #{docs}"
-      )
-    end
+          ## get only the function docs which are :none
+          function_docs =
+            Enum.filter(function_docs, fn {{_kind, _name, _arity}, _ann, _signature, docs, _meta} ->
+              docs == :none
+            end)
+
+          {:docs_v1, annotation, beam_language, format, module_doc, metadata, function_docs}
+        end)
+
+      all_none_function_docs =
+        Enum.reduce(docs_per_module, [], fn {:docs_v1, _annotation, _beam_language, _format,
+                                             _module_doc, _metadata, function_docs},
+                                            acc ->
+          function_docs ++ acc
+        end)
+
+      ## Basically filtering the functions just the non documented functions
+      functions =
+        Enum.filter(names, fn {whatever, _something} -> whatever == :function end)
+        |> Enum.filter(fn {:function, {name, _stringify}} ->
+          Enum.any?(all_none_function_docs, fn
+            {{:function, name_to_check, _arity}, _line, _signature, :none, %{}} ->
+              name == name_to_check
+
+            {_non_func_node, _line, [], :none, %{}} ->
+              false
+          end)
+        end)
+
+      %{
+        file: file,
+        content: content,
+        lines: String.split(content, "\n") |> Stream.map(&String.trim/1) |> Enum.with_index(),
+        ast: ast,
+        modules: modules,
+        functions: functions,
+        docs_per_module: docs_per_module,
+        comments: comments
+      }
+    end)
+    |> Enum.each(fn entry ->
+      IO.inspect(entry.modules)
+      IO.inspect(entry.docs_per_module)
+      IO.inspect(entry.functions)
+      IO.inspect(entry.lines)
+
+      ast_acc =
+        Enum.reduce(entry.functions, entry.ast, fn {:function,
+                                                    {function_atom, function_stringified}},
+                                                   acc_ast ->
+          function_prompt = final_prompt <> function_stringified
+          IO.inspect(function_prompt)
+
+          response = request_prompt(function_prompt, provider, model_text, token)
+
+          docs = get_docs_from_response(response)
+
+          ok? = docs_are_ok?(docs)
+
+          if ok? do
+            result =
+              Code.string_to_quoted_with_comments(docs,
+                literal_encoder: &{:ok, {:__block__, &2, [&1]}},
+                token_metadata: true,
+                unescape: false
+              )
+
+            case result do
+              {:ok, node, _} ->
+                IO.inspect(node)
+
+                insert_doc_for_function(acc_ast, function_atom, node)
+
+              {:error, reason} ->
+                IO.puts("Cannot parse the response as an Elixir AST: #{inspect(reason)}")
+                acc_ast
+            end
+
+            ## TO_DO: change this to entry.file
+          else
+            Logger.error(
+              "docs are in a wrong format review your model #{model} or your prompt\n\n this was returned by the AI: #{docs}"
+            )
+          end
+        end)
+
+      write_to_file_formatted("hello.ex", ast_acc, entry.comments)
+    end)
   end
 
   @github_ai_endpoint "https://models.github.ai/inference/chat/completions"
