@@ -17,8 +17,10 @@ defmodule Mix.Tasks.LazyDoc do
 
     token = Application.get_env(:lazy_doc, :token)
 
+    path_wildcard = Application.get_env(:lazy_doc, :path_wilcard, "lib/**/*.ex")
+
     files =
-      Path.wildcard("lib/**/*.ex")
+      Path.wildcard(path_wildcard)
       |> Enum.map(fn file ->
         # this task is for dev purposes so if we do not have a success reading a file is weird.
         {:ok, content} = File.read(file)

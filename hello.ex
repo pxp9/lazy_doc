@@ -20,9 +20,9 @@ defmodule LazyDoc do
 
   Parameters
 
-  - None
+  None
   Description
-   Prints "Hello world" to the standard output.
+   Outputs "Hello world" to the console.
 
   Returns
    None
