@@ -1,4 +1,5 @@
 import Config
+alias LazyDoc.Providers.GithubAi
 
 _ = """
       :codestral -> "Codestral-2501"
@@ -7,7 +8,7 @@ _ = """
 
 """
 
-config :lazy_doc, :provider, {:github, :gpt_4o_mini}
+config :lazy_doc, :provider, {GithubAi, :gpt_4o_mini}
 
 config :lazy_doc,
        :custom_function_prompt,
