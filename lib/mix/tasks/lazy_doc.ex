@@ -1,4 +1,6 @@
 defmodule Mix.Tasks.LazyDoc do
+  alias LazyDoc.Provider
+
   require Logger
   use Mix.Task
 
@@ -19,12 +21,14 @@ defmodule Mix.Tasks.LazyDoc do
   def run(_command_line_args) do
     ## Start req
 
-    _result = Application.ensure_started(:req)
+    _result = Application.ensure_started(:telemetry)
 
-    _result = Application.ensure_started(:lazy_doc)
+    _result = Req.Application.start("", "")
 
-    {provider, model} = Application.get_env(:lazy_doc, :provider)
-    model_text = models(provider, model)
+    _result = LazyDoc.Application.start("", "")
+
+    {provider_mod, model} = Application.get_env(:lazy_doc, :provider)
+    model_text = Provider.model(provider_mod, model)
 
     final_prompt =
       Application.get_env(:lazy_doc, :custom_function_prompt, @default_function_prompt)
@@ -117,9 +121,11 @@ defmodule Mix.Tasks.LazyDoc do
           function_prompt = final_prompt <> function_stringified
           IO.inspect(function_prompt)
 
-          response = request_prompt(function_prompt, provider, model_text, token)
+          ## TO_DO: probably we should something here instead of just doing :ok
+          {:ok, response} =
+            Provider.request_prompt(provider_mod, function_prompt, model_text, token)
 
-          docs = get_docs_from_response(response)
+          docs = Provider.get_docs_from_response(provider_mod, response)
 
           ok? = docs_are_ok?(docs)
 
@@ -150,27 +156,6 @@ defmodule Mix.Tasks.LazyDoc do
 
       write_to_file_formatted(entry.file, ast_acc, entry.comments)
     end)
-  end
-
-  @github_ai_endpoint "https://models.github.ai/inference/chat/completions"
-  defp request_prompt(message, :github, model, token) do
-    body = %{
-      max_tokens: 2048,
-      messages: [
-        %{"role" => "system", "content" => ""},
-        %{"role" => "user", "content" => message}
-      ],
-      model: "#{model}",
-      temperature: 1,
-      top_p: 1
-    }
-
-    Req.Request.new(url: @github_ai_endpoint, options: [json: body, receive_timeout: 240_000])
-    |> Req.Request.put_header("Accept", "application/json")
-    |> Req.Request.put_header("Content-Type", "application/json;charset=UTF-8")
-    |> Req.Request.put_header("Authorization", "Bearer #{token}")
-    |> Req.Steps.encode_body()
-    |> Req.post!()
   end
 
   @doc """
@@ -240,25 +225,6 @@ defmodule Mix.Tasks.LazyDoc do
 
   defp extract_names({_whatever, _meta, _children}, acc) do
     acc
-  end
-
-  defp github_models(model) do
-    case model do
-      :codestral -> "Codestral-2501"
-      :gpt_4o -> "gpt-4o"
-      :gpt_4o_mini -> "gpt-4o-mini"
-    end
-  end
-
-  defp models(:github, model) do
-    github_models(model)
-  end
-
-  defp get_docs_from_response(%Req.Response{body: body} = _response) do
-    map = Jason.decode!(body) |> dbg()
-    ## Take always first choice
-    message = Enum.at(map["choices"], 0)["message"]["content"]
-    message
   end
 
   def docs_are_ok?(docs) when is_binary(docs) do

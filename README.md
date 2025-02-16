@@ -3,17 +3,15 @@
 Lazy Doc is a project for those who are lazy af to document their code.
 
 It is designed to detect undocumented functions, pass the function to an AI
-provider which is a tuple of two elements `{:github, :codestral}`.
+provider which is a tuple of two elements `{GithubAi, :codestral}`.
 
 ## Roadmap
 
 - Make AI docs for modules as well, `@module_doc`.
 - Inspect the `defimpl` and `defprotocol` nodes.
-- Make AI providers more extensible (define a protocol of what an AI provider
-  should do).
-  - request callback
-  - response callback (basically get a plain string with the docs so the task
-    can parse it as AST).
+- Customizable number of retries.
+- Custom paramters to pass the model (max_tokens, top_p, temperature).
+- Run mix format after writing the files, just in case.
 - Make some tests.
 
 ## Installation
@@ -21,7 +19,7 @@ provider which is a tuple of two elements `{:github, :codestral}`.
 ``` elixir
 def deps do
   [
-    {:lazy_doc, "~> 0.1.0"}
+    {:lazy_doc, "~> 0.2.0"}
   ]
 end
 ```
@@ -31,7 +29,8 @@ end
 `config/config.exs`
 
 ``` elixir
-config :lazy_doc, :provider, {:github, :gpt_4o_mini}
+## alias of GithubAi above
+config :lazy_doc, :provider, {GithubAi, :gpt_4o_mini}
 
 config :lazy_doc,
        :custom_function_prompt,
@@ -51,3 +50,12 @@ config :lazy_doc, :token, System.get_env("API_TOKEN")
 ``` bash
 API_TOKEN="YOUR AWESOME TOKEN"
 ```
+
+## How to run it ?
+
+From the root of the elixir project once installed and configured.
+
+```bash
+mix lazy_doc
+```
+I would recommend to run a `mix format` after just in case.
