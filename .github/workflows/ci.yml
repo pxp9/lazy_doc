@@ -15,36 +15,6 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.14.5
-              otp: 24.3.4
-          - pair:
-              elixir: 1.15.7
-              otp: 24.3.4
-          - pair:
-              elixir: 1.16.1
-              otp: 24.3.4
-          - pair:
-              elixir: 1.14.5
-              otp: 25.3.2
-          - pair:
-              elixir: 1.15.7
-              otp: 25.3.2
-          - pair:
-              elixir: 1.16.1
-              otp: 25.3.2
-          - pair:
-              elixir: 1.14.5
-              otp: 26.2.5
-          - pair:
-              elixir: 1.15.7
-              otp: 26.2.5
-          - pair:
-              elixir: 1.16.2
-              otp: 26.2.5
-          - pair:
-              elixir: 1.17.2
-              otp: 26.2.5
-          - pair:
               elixir: 1.17.2
               otp: 27.0.1
             lint: lint
@@ -52,17 +22,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: erlef/setup-beam@v1
-        with:
-          otp-version: ${{matrix.pair.otp}}
-          elixir-version: ${{matrix.pair.elixir}}
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/cache@v2
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1.15.4
         with:
-          path: |
-            deps
-            _build
+          version-file: .tool-versions
+          version-type: strict
+            
+      - name: Caching deps
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-elixir-deps
+          tool-versions-path: .tool-versions
+          mix-lock-path: mix.lock
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-
+
+
+      - name: Caching build
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-elixir-build
+          tool-versions-path: .tool-versions
+          mix-lock-path: mix.lock
+        with:
+          path: _build
+          key: ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-
+
+      - name: Caching dialyzer PLT
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-elixir-dialyzer
+          tool-versions-path: .tool-versions
+          mix-lock-path: mix.lock
+        with:
+          path: ${{ inputs.project-directory }}/priv/plts
           key: ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-${{ hashFiles('**/mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-
