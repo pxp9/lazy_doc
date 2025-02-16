@@ -11,6 +11,7 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 - Inspect the `defimpl` and `defprotocol` nodes.
 - Customizable number of retries.
 - Custom paramters to pass the model (max_tokens, top_p, temperature).
+- Run mix format after writing the files, just in case.
 - Make some tests.
 
 ## Installation
@@ -18,7 +19,7 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 ``` elixir
 def deps do
   [
-    {:lazy_doc, "~> 0.1.0"}
+    {:lazy_doc, "~> 0.2.0"}
   ]
 end
 ```
@@ -49,3 +50,12 @@ config :lazy_doc, :token, System.get_env("API_TOKEN")
 ``` bash
 API_TOKEN="YOUR AWESOME TOKEN"
 ```
+
+## How to run it ?
+
+From the root of the elixir project once installed and configured.
+
+```bash
+mix lazy_doc
+```
+I would recommend to run a `mix format` after just in case.
