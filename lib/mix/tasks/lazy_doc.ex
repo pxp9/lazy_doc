@@ -1,5 +1,5 @@
 defmodule Mix.Tasks.LazyDoc do
-  alias LazyDoc.ProviderBehavior
+  alias LazyDoc.Provider
 
   require Logger
   use Mix.Task
@@ -28,7 +28,7 @@ defmodule Mix.Tasks.LazyDoc do
     _result = LazyDoc.Application.start("", "")
 
     {provider_mod, model} = Application.get_env(:lazy_doc, :provider)
-    model_text = ProviderBehavior.model(provider_mod, model)
+    model_text = Provider.model(provider_mod, model)
 
     final_prompt =
       Application.get_env(:lazy_doc, :custom_function_prompt, @default_function_prompt)
@@ -123,9 +123,9 @@ defmodule Mix.Tasks.LazyDoc do
 
           ## TO_DO: probably we should something here instead of just doing :ok
           {:ok, response} =
-            ProviderBehavior.request_prompt(provider_mod, function_prompt, model_text, token)
+            Provider.request_prompt(provider_mod, function_prompt, model_text, token)
 
-          docs = ProviderBehavior.get_docs_from_response(provider_mod, response)
+          docs = Provider.get_docs_from_response(provider_mod, response)
 
           ok? = docs_are_ok?(docs)
 

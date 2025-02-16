@@ -1,4 +1,4 @@
-defmodule LazyDoc.ProviderBehavior do
+defmodule LazyDoc.Provider do
   @callback request_prompt(prompt :: binary(), model :: binary(), token :: binary()) ::
               {:ok, Req.Response.t()} | {:error, Exception.t()}
 

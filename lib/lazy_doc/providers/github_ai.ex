@@ -1,5 +1,5 @@
 defmodule LazyDoc.Providers.GithubAi do
-  @behaviour LazyDoc.ProviderBehavior
+  @behaviour LazyDoc.Provider
 
   @github_ai_endpoint "https://models.github.ai/inference/chat/completions"
 
