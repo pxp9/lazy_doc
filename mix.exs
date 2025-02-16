@@ -9,7 +9,22 @@ defmodule LazyDoc.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: "A Mix task for documenting your projects with AI",
-      package: package()
+      package: package(),
+      aliases: aliases(),
+      name: "LazyDoc",
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test,
+        "base.ci": :test
+      ],
+      dialyzer: [
+        check_plt: true,
+        plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
+        plt_add_apps: [:ex_unit, :mix]
+      ]
     ]
   end
 
@@ -40,7 +55,26 @@ defmodule LazyDoc.MixProject do
       {:dotenv, "~> 3.0.0", only: [:dev]},
       {:req, "~> 0.4.0"},
       {:jason, "~> 1.0"},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+      ## Testing and converalls
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.18", only: :test}
+    ]
+  end
+
+  defp aliases() do
+    [
+      "base.ci": [
+        "deps.get",
+        "compile --warnings-as-errors",
+        "format",
+        "credo --strict",
+        "dialyzer --plt --force-check",
+        "dialyzer --format github",
+        "deps.unlock --check-unused",
+        "test"
+      ]
     ]
   end
 end
