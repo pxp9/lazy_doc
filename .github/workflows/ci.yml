@@ -19,7 +19,7 @@ jobs:
               otp: 27.0.1
             lint: lint
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code
