@@ -226,7 +226,7 @@ defmodule Mix.Tasks.LazyDoc do
           unescape: false
         )
 
-      names = extract_names(ast)
+      names = extract_names(ast) |> join_code_from_clauses()
 
       modules =
         Enum.filter(names, fn {whatever, _name} -> whatever == :module end)
@@ -255,6 +255,74 @@ defmodule Mix.Tasks.LazyDoc do
         comments: comments
       }
     end)
+  end
+
+  @doc """
+
+  Parameters
+
+  names - a list of tuples where each tuple represents either a function or another type of element.
+  Description
+   Combines function code from the input list based on matching function names.
+
+  Returns
+   a list of tuples containing combined functions or original elements.
+
+  """
+  def join_code_from_clauses(names) do
+    join_code_from_clauses(names, [])
+  end
+
+  ## End of the recursion, just 2 elements.
+  def join_code_from_clauses(
+        [{type_1, value_1} = elem_1, {type_2, value_2} = elem_2],
+        acc
+      ) do
+    if type_1 == type_2 and type_1 == :function do
+      {name, code_first} = value_1
+      {name_2, code_second} = value_2
+
+      if name == name_2 do
+        function = {:function, {name, code_second <> "\n" <> code_first}}
+        [function | acc]
+      else
+        [elem_1, elem_2 | acc]
+      end
+    else
+      [elem_1, elem_2 | acc]
+    end
+  end
+
+  ## Recursion case if we have 2 functions a the head of the list.
+  def join_code_from_clauses(
+        [
+          {:function, {name, code_first}} = func_1,
+          {:function, {name_2, code_second}} = func_2 | rest
+        ],
+        acc
+      ) do
+    if name == name_2 do
+      function = {:function, {name, code_second <> "\n" <> code_first}}
+      join_code_from_clauses([function | rest], acc)
+    else
+      join_code_from_clauses([func_2 | rest], [func_1 | acc])
+    end
+  end
+
+  ## Recursion case if we have 2 different types of element.
+  def join_code_from_clauses(
+        [{:function, {_name, _code_first}} = func_1, {_other_type, _elem} = name | rest],
+        acc
+      ) do
+    join_code_from_clauses([name | rest], [func_1 | acc])
+  end
+
+  ## Recursion case if we have 2 different types of element.
+  def join_code_from_clauses(
+        [{_other_type, _elem} = name, {:function, {_name, _code_first}} = func_1 | rest],
+        acc
+      ) do
+    join_code_from_clauses([func_1 | rest], [name | acc])
   end
 
   @doc """
