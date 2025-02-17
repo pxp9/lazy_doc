@@ -10,8 +10,11 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 - Make AI docs for modules as well, `@module_doc`.
 - Inspect the `defimpl` and `defprotocol` nodes.
 - Customizable number of retries.
-- Custom paramters to pass the model (max_tokens, top_p, temperature).
+- Custom paramters to pass the model (max\_tokens, top\_p, temperature).
 - Run mix format after writing the files, just in case.
+- BUG if function has multiple clauses AI is called one time per each clause.
+  (it should document just first clause or even better take the code of the N
+  clauses and insert the docs on top the first clause)
 - Make some tests.
 
 ## Installation
@@ -55,7 +58,8 @@ API_TOKEN="YOUR AWESOME TOKEN"
 
 From the root of the elixir project once installed and configured.
 
-```bash
+``` bash
 mix lazy_doc
 ```
+
 I would recommend to run a `mix format` after just in case.

@@ -1,0 +1,99 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  ci:
+    env:
+      MIX_ENV: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - pair:
+              elixir: 1.17.2
+              otp: 27.0.1
+            lint: lint
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1.15.4
+        with:
+          version-file: .tool-versions
+          version-type: strict
+            
+      - name: Caching deps
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-elixir-deps
+          tool-versions-path: .tool-versions
+          mix-lock-path: mix.lock
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-
+
+
+      - name: Caching build
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-elixir-build
+          tool-versions-path: .tool-versions
+          mix-lock-path: mix.lock
+        with:
+          path: _build
+          key: ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-
+
+      - name: Caching dialyzer PLT
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-elixir-dialyzer
+          tool-versions-path: .tool-versions
+          mix-lock-path: mix.lock
+        with:
+          path: ${{ inputs.project-directory }}/priv/plts
+          key: ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-
+
+      - name: Run mix deps.get
+        run: mix deps.get --only test
+
+      - name: Run mix format
+        run: mix format --check-formatted
+        if: ${{ matrix.lint }}
+
+      - name: Run mix deps.compile
+        run: mix deps.compile
+
+      - name: Run mix compile
+        run: mix compile --warnings-as-errors
+        if: ${{ matrix.lint }}
+
+      - name: Run credo
+        run: mix credo --strict
+        if: ${{ matrix.lint }}
+
+      - name: Run mix test
+        run: mix test
+
+      - name: Run dialyzer
+        run: mix dialyzer --format github
+        if: ${{ matrix.lint }}
+
+      # - name: Run Coveralls
+      #   run: mix coveralls.github
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

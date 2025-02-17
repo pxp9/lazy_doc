@@ -54,7 +54,7 @@ defmodule LazyDoc.Providers.GithubAi do
 
   """
   def get_docs_from_response(%Req.Response{body: body} = _response) do
-    map = Jason.decode!(body) |> dbg()
+    map = Jason.decode!(body)
     ## Take always first choice
     message = Enum.at(map["choices"], 0)["message"]["content"]
     message
