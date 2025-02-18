@@ -12,9 +12,6 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 - Customizable number of retries.
 - Custom paramters to pass the model (max\_tokens, top\_p, temperature).
 - Run mix format after writing the files, just in case.
-- BUG if function has multiple clauses AI is called one time per each clause.
-  (it should document just first clause or even better take the code of the N
-  clauses and insert the docs on top the first clause)
 - Make some tests.
 
 ## Installation
