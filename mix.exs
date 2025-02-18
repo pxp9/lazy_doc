@@ -56,6 +56,7 @@ defmodule LazyDoc.MixProject do
       {:req, "~> 0.4.0"},
       {:jason, "~> 1.0"},
       ## Testing and converalls
+      {:plug, "~> 1.0", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
