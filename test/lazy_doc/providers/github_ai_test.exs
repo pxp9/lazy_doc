@@ -1,10 +1,13 @@
 defmodule LazyDoc.Providers.GithubAiTest do
   use ExUnit.Case
 
+  alias LazyDoc.Provider
   alias LazyDoc.Providers.GithubAi
 
   test "test success calling the provider" do
-    model = GithubAi.model(:gpt_4o_mini)
+    model = Provider.model(GithubAi, :gpt_4o_mini)
+
+    assert model == "gpt-4o-mini"
     token = "TOKEN"
     prompt = "some prompt"
 
@@ -19,13 +22,13 @@ defmodule LazyDoc.Providers.GithubAiTest do
 
     assert {:ok, resp} = req |> Req.post()
 
-    docs = GithubAi.get_docs_from_response(resp)
+    docs = Provider.get_docs_from_response(GithubAi, resp)
 
     assert "@doc \"\"\"\n #{prompt} \n\"\"\"" == docs
   end
 
   def example_response(prompt) do
-    map = %{
+    %{
       "choices" => [
         %{
           "content_filter_results" => %{
@@ -82,7 +85,5 @@ defmodule LazyDoc.Providers.GithubAiTest do
         "total_tokens" => 21
       }
     }
-
-    Jason.encode!(map)
   end
 end

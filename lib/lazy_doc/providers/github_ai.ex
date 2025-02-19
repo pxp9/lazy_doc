@@ -26,6 +26,21 @@ defmodule LazyDoc.Providers.GithubAi do
     |> Req.post()
   end
 
+  @doc """
+
+  Parameters
+
+  prompt - the input text or question to be sent to the model.
+  model - the identifier for the specific model to use for generating a response.
+  token - the authorization token required for accessing the API.
+
+  Description
+   Constructs a request to query an AI model with a given prompt and specified parameters.
+
+  Returns
+   a structured request object ready to interact with the API at the configured endpoint.
+
+  """
   def req_query(prompt, model, token) do
     body = %{
       max_tokens: 2048,
@@ -58,9 +73,8 @@ defmodule LazyDoc.Providers.GithubAi do
 
   """
   def get_docs_from_response(%Req.Response{body: body} = _response) do
-    map = Jason.decode!(body)
     ## Take always first choice
-    message = Enum.at(map["choices"], 0)["message"]["content"]
+    message = Enum.at(body["choices"], 0)["message"]["content"]
     message
   end
 

@@ -6,6 +6,9 @@ defmodule LazyDoc do
   the task provided.
   """
 
+  ## This comment is just to ilustrate that the algorithm will
+  ## take the comments
+
   @doc """
 
   Parameters

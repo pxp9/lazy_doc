@@ -258,23 +258,21 @@ defmodule Mix.Tasks.LazyDoc do
   end
 
   @doc """
-
   Parameters
 
-  names - a list of tuples where each tuple represents either a function or another type of element.
+  names - a list of tuples where each tuple contains a type and a value. The type indicates the kind of element (e.g., :function) and the value is related to that type.
   Description
-   Combines function code from the input list based on matching function names.
+   Joins code from function clauses based on their names, merging the code of functions with the same name.
 
   Returns
-   a list of tuples containing combined functions or original elements.
-
+   a list of elements where functions with the same name are combined into a single tuple with their code concatenated.
   """
   def join_code_from_clauses(names) do
     join_code_from_clauses(names, [])
   end
 
   ## End of the recursion, just 2 elements.
-  def join_code_from_clauses(
+  defp join_code_from_clauses(
         [{type_1, value_1} = elem_1, {type_2, value_2} = elem_2],
         acc
       ) do
@@ -294,7 +292,7 @@ defmodule Mix.Tasks.LazyDoc do
   end
 
   ## Recursion case if we have 2 functions a the head of the list.
-  def join_code_from_clauses(
+  defp join_code_from_clauses(
         [
           {:function, {name, code_first}} = func_1,
           {:function, {name_2, code_second}} = func_2 | rest
@@ -310,7 +308,7 @@ defmodule Mix.Tasks.LazyDoc do
   end
 
   ## Recursion case if we have 2 different types of element.
-  def join_code_from_clauses(
+  defp join_code_from_clauses(
         [{:function, {_name, _code_first}} = func_1, {_other_type, _elem} = name | rest],
         acc
       ) do
@@ -318,7 +316,7 @@ defmodule Mix.Tasks.LazyDoc do
   end
 
   ## Recursion case if we have 2 different types of element.
-  def join_code_from_clauses(
+  defp join_code_from_clauses(
         [{_other_type, _elem} = name, {:function, {_name, _code_first}} = func_1 | rest],
         acc
       ) do
@@ -450,6 +448,10 @@ defmodule Mix.Tasks.LazyDoc do
 
           docs_to_node(ok?, docs, acc_ast, function_atom)
         end)
+      # TO_DO: probably we should check if the ast_acc is the same as entry.ast
+      # if true we should not write the file.
+      # A simple but effective will be if entry.functions is empty
+      # Do not write the file.
 
       write_to_file_formatted(entry.file, ast_acc, entry.comments)
     end)
