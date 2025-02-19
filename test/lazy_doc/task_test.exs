@@ -158,10 +158,10 @@ defmodule LazyDoc.TaskTest do
      [
        {:doc, _meta_doc,
         [
-          {:__block__, _meta_block , [message]}
+          {:__block__, _meta_block, [message]}
         ]}
      ]} = Enum.at(block_children, index - 1)
 
-     assert message == "pepe frog\n"
+    assert message == "pepe frog\n"
   end
 end

@@ -273,9 +273,9 @@ defmodule Mix.Tasks.LazyDoc do
 
   ## End of the recursion, just 2 elements.
   defp join_code_from_clauses(
-        [{type_1, value_1} = elem_1, {type_2, value_2} = elem_2],
-        acc
-      ) do
+         [{type_1, value_1} = elem_1, {type_2, value_2} = elem_2],
+         acc
+       ) do
     if type_1 == type_2 and type_1 == :function do
       {name, code_first} = value_1
       {name_2, code_second} = value_2
@@ -293,12 +293,12 @@ defmodule Mix.Tasks.LazyDoc do
 
   ## Recursion case if we have 2 functions a the head of the list.
   defp join_code_from_clauses(
-        [
-          {:function, {name, code_first}} = func_1,
-          {:function, {name_2, code_second}} = func_2 | rest
-        ],
-        acc
-      ) do
+         [
+           {:function, {name, code_first}} = func_1,
+           {:function, {name_2, code_second}} = func_2 | rest
+         ],
+         acc
+       ) do
     if name == name_2 do
       function = {:function, {name, code_second <> "\n" <> code_first}}
       join_code_from_clauses([function | rest], acc)
@@ -309,17 +309,17 @@ defmodule Mix.Tasks.LazyDoc do
 
   ## Recursion case if we have 2 different types of element.
   defp join_code_from_clauses(
-        [{:function, {_name, _code_first}} = func_1, {_other_type, _elem} = name | rest],
-        acc
-      ) do
+         [{:function, {_name, _code_first}} = func_1, {_other_type, _elem} = name | rest],
+         acc
+       ) do
     join_code_from_clauses([name | rest], [func_1 | acc])
   end
 
   ## Recursion case if we have 2 different types of element.
   defp join_code_from_clauses(
-        [{_other_type, _elem} = name, {:function, {_name, _code_first}} = func_1 | rest],
-        acc
-      ) do
+         [{_other_type, _elem} = name, {:function, {_name, _code_first}} = func_1 | rest],
+         acc
+       ) do
     join_code_from_clauses([func_1 | rest], [name | acc])
   end
 
@@ -448,6 +448,7 @@ defmodule Mix.Tasks.LazyDoc do
 
           docs_to_node(ok?, docs, acc_ast, function_atom)
         end)
+
       # TO_DO: probably we should check if the ast_acc is the same as entry.ast
       # if true we should not write the file.
       # A simple but effective will be if entry.functions is empty
