@@ -24,7 +24,7 @@ defmodule LazyDoc.Providers.GithubAiTest do
 
     docs = Provider.get_docs_from_response(GithubAi, resp)
 
-    assert "@doc \"\"\"\n #{prompt} \n\"\"\"" == docs
+    assert ~s(@doc """\n #{prompt} \n""") == docs
   end
 
   def example_response(prompt) do

@@ -117,7 +117,7 @@ defmodule LazyDoc.TaskTest do
   end
 
   test "test docs_are_ok?" do
-    assert TaskLazyDoc.docs_are_ok?("@doc \"\"\"\n pepe frog \"\"\"") == true
+    assert TaskLazyDoc.docs_are_ok?(~s("@doc """\n pepe frog """)) == true
     assert TaskLazyDoc.docs_are_ok?("@doc \" queso curado \"") == true
     assert TaskLazyDoc.docs_are_ok?("pepe meme") == false
   end
