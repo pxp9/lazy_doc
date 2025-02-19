@@ -1,7 +1,7 @@
 defmodule LazyDoc.ExampleModule do
   ## This function should be returned
   def hello(param) do
-    IO.inspect(param)
+    IO.puts(param)
   end
 
   ## This function should be returned
