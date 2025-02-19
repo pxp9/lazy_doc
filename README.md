@@ -12,7 +12,7 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 - Customizable number of retries.
 - Custom paramters to pass the model (max\_tokens, top\_p, temperature).
 - Run mix format after writing the files, just in case.
-- Improve the default prompt for generating markdown syntax.
+- Improve the default prompt to generate markdown syntax.
 - BUG? To discuss this behavior, functions with same name but different arity , generates docs and the docs are inserted in the first clause (probably it is due to the filtering after fetching the docs).
 
 ## Installation
