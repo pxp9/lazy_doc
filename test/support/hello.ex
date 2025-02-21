@@ -1,19 +1,41 @@
-defmodule LazyDoc.ExampleModule do
+defmodule LazyDoc.ExampleModule.Generated do
   @type algorithms :: binary()
+  @doc """
+
+  Parameters
+
+  param - a value that will be printed to the console.
+  Description
+   Outputs the provided parameter to the standard output.
+
+  Returns
+   None
+
+  """
 
   ## This function should be returned
   def hello(param) do
     IO.puts(param)
   end
 
+  @doc """
+
+  Parameters
+
+  None
+  Description
+   Executes the function hi() twice.
+
+  Returns
+   None
+
+  """
+
   ## This function should be returned
   def hihi() do
     hi()
     hi()
   end
-
-  ## This function should be returned
-  def hello_there(i) when is_atom(i), do: IO.puts("Hello there #{i}")
 
   ## This function should be ignored bc is private.
   defp hi(), do: IO.puts("hi")
@@ -42,6 +64,18 @@ defmodule LazyDoc.ExampleModule do
   end
 
   defmodule Fibs do
+    @doc """
+
+    Parameters
+
+    n - integer representing the position in the Fibonacci sequence to be calculated.
+    Description
+     Computes Fibonacci numbers using a tail-recursive approach.
+
+    Returns
+     a list of Fibonacci numbers up to the nth position.
+
+    """
     def fibs(n) do
       fibs(n, [1, 0])
     end
@@ -53,6 +87,18 @@ defmodule LazyDoc.ExampleModule do
     end
 
     defmodule InnerFibs do
+      @doc """
+
+      Parameters
+
+      None
+      Description
+       Prints the string "fibs" to the console.
+
+      Returns
+       None
+
+      """
       def inner_fibs() do
         IO.puts("fibs")
       end

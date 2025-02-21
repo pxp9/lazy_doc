@@ -1,7 +1,5 @@
 import Config
 
-if Mix.env() == :dev do
-  Dotenv.load!()
-end
+Dotenv.load!()
 
 config :lazy_doc, :token, System.get_env("API_TOKEN")
