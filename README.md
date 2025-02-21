@@ -13,7 +13,8 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 - Custom paramters to pass the model (max\_tokens, top\_p, temperature).
 - Run mix format after writing the files, just in case.
 - Improve the default prompt to generate markdown syntax.
-- Make a task or an arg in the current task to check if the functions are documented. (allows CI usage)
+- Make a task or an arg in the current task to check if the functions are
+  documented. (allows CI usage)
 
 ## Installation
 
@@ -61,3 +62,43 @@ mix lazy_doc
 ```
 
 I would recommend to run a `mix format` after just in case.
+
+## Known limitations that wont be fixed.
+
+### Module names must be different.
+If the user creates an inner module with the same name as the parent module
+`lazy_doc`, it wont work properly because they have the same `:__aliases__` AST
+node.
+
+> Note: this limitation it is only in module names. So if the user have same
+> names of functions in different modules or in the same module, it will work.
+
+``` elixir
+
+defmodule Hello do
+
+  defmodule Hello do
+
+  end
+
+end
+```
+
+produces the following AST
+
+``` elixir
+{:defmodule, [line: 1],
+ [
+## This is why it does not work [:Hello] 
+   {:__aliases__, [line: 1], [:Hello]},
+   [
+     do: {:defmodule, [line: 3],
+      [
+        {:__aliases__, [line: 3],
+## This is why it does not work [:Hello] 
+         [:Hello]},
+        [do: {:__block__, [], []}]
+      ]}
+   ]
+ ]}
+```
