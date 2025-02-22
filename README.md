@@ -12,9 +12,6 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 - Customizable number of retries.
 - Custom paramters to pass the model (max\_tokens, top\_p, temperature).
 - Run mix format after writing the files, just in case.
-- Improve the default prompt to generate markdown syntax.
-- Make a task or an arg in the current task to check if the functions are
-  documented. (allows CI usage)
 
 ## Installation
 
