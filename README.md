@@ -21,7 +21,7 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 ``` elixir
 def deps do
   [
-    {:lazy_doc, "~> 0.2.0"}
+    {:lazy_doc, "~> 0.3.0"}
   ]
 end
 ```
