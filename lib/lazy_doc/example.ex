@@ -83,4 +83,8 @@ defmodule LazyDoc.Example do
   def my_func(n) do
     "is #{inspect(n)}"
   end
+
+  def hello_world() do
+    IO.puts("hello world")
+  end
 end
