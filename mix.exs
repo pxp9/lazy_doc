@@ -73,6 +73,7 @@ defmodule LazyDoc.MixProject do
       "base.ci": [
         "deps.get",
         "compile --warnings-as-errors",
+        "lazy_doc",
         "format",
         "credo --strict",
         "dialyzer --plt --force-check",

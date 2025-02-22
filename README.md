@@ -60,9 +60,17 @@ mix lazy_doc
 
 I would recommend to run a `mix format` after just in case.
 
+If you want, you can add a simple check to see what needs to be documented in
+your project. This is good for CI.
+
+``` bash
+mix lazy_doc.check
+```
+
 ## Known limitations that wont be fixed.
 
 ### Module names in the same file must be different.
+
 If the user creates an inner module with the same name as the parent module
 `lazy_doc`, it wont work properly because they have the same `:__aliases__` AST
 node.
