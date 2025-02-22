@@ -55,6 +55,7 @@ defmodule Mix.Tasks.LazyDoc do
    a list of names extracted from the AST.
 
   """
+  # TO_DO: support defprotocol and defimpl
   def extract_names(ast) do
     extract_names(ast, [])
   end
@@ -67,7 +68,19 @@ defmodule Mix.Tasks.LazyDoc do
          {:defmodule, _meta, [{:__aliases__, _meta_aliases, module_name}, children]},
          acc
        ) do
-    [{:module, module_name}] ++ extract_names(children) ++ acc
+    children_names = extract_names(children, [])
+
+    {modules, funcs} =
+      Enum.split_with(children_names, fn elem ->
+        match?({:module, _name, _name_ast, _children}, elem)
+      end)
+
+    modules =
+      Enum.map(modules, fn {:module, name, name_ast, child_module_children} ->
+        {:module, module_name ++ name, name_ast, child_module_children}
+      end)
+
+    [{:module, module_name, module_name, funcs} | acc] ++ modules
   end
 
   defp extract_names({:defprotocol, _meta, [protocol_name, _]}, acc) do
@@ -80,21 +93,36 @@ defmodule Mix.Tasks.LazyDoc do
     acc
   end
 
-  ## TO_DO: probably here we should explore the siblings nodes until
-  # the name of the function changes or it is different type of node.
-  # An alternative solution will be to fix the names list after we have extracted all the names.
+  defp extract_names(
+         {:def, _meta_def,
+          [{:when, _meta_when, [{name, _meta_func, _params}, _when_expr]}, _func_block]} =
+           ast_fun,
+         acc
+       ) do
+    [{:function, {name, Macro.to_string(ast_fun)}} | acc]
+  end
+
+  defp extract_names(
+         {:defp, _meta_def,
+          [{:when, _meta_when, [{name, _meta_func, _params}, _when_expr]}, _func_block]} =
+           ast_fun,
+         acc
+       ) do
+    [{:function_p, {name, Macro.to_string(ast_fun)}} | acc]
+  end
+
   defp extract_names(
          {:def, _meta_func, [{name, _meta_inner_func, _children} | _block]} = ast_fun,
          acc
        ) do
-    # You might want to extract function names as well
-    [{:function, {name, Macro.to_string(ast_fun)}}] ++ acc
+    [{:function, {name, Macro.to_string(ast_fun)}} | acc]
   end
 
-  defp extract_names({:defp, _meta, [_function_name, _clauses]}, acc) do
-    # You might want to extract function names as well
-    # {:function, function_name} ++ acc
-    acc
+  defp extract_names(
+         {:defp, _meta_func, [{name, _meta_inner_func, _children} | _block]} = ast_fun,
+         acc
+       ) do
+    [{:function_p, {name, Macro.to_string(ast_fun)}} | acc]
   end
 
   defp extract_names(
@@ -104,6 +132,23 @@ defmodule Mix.Tasks.LazyDoc do
     extract_names(children) ++ acc
   end
 
+  ### Explore module with a single node which is a function
+  defp extract_names(
+         {{:__block__, _meta, _block_children}, {:def, _meta_inner_block, _children} = node},
+         acc
+       ) do
+    extract_names([node]) ++ acc
+  end
+
+  ### Explore module with a single node which is a function
+  defp extract_names(
+         {{:__block__, _meta, _block_children}, {:defp, _meta_inner_block, _children} = node},
+         acc
+       ) do
+    extract_names([node]) ++ acc
+  end
+
+  ## Ignore children from function blocks
   defp extract_names(
          {{:__block__, _meta, _block_children}, {_whatever_op, _meta_inner_block, _children}},
          acc
@@ -115,6 +160,18 @@ defmodule Mix.Tasks.LazyDoc do
     acc
   end
 
+  @doc """
+
+  Parameters
+
+  docs - a string representing the documentation to be validated.
+  Description
+   Checks if the provided documentation format is correct.
+
+  Returns
+   true if the documentation is formatted correctly, false otherwise.
+
+  """
   def docs_are_ok?(docs) when is_binary(docs) do
     match?("@doc \" " <> _, docs) or match?("@doc \"\"\"\n" <> _, docs)
   end
@@ -150,28 +207,33 @@ defmodule Mix.Tasks.LazyDoc do
   @doc """
    This should work for most of the modules, it will not work if the module contains only one function because Elixir does not create a `__block__` node in this case.
   """
-  def insert_doc_for_function(ast, name_func, ast_doc) do
+  def insert_doc_for_function(ast, name_func, ast_doc, module_ast) do
     {new_ast, _acc} =
       Macro.traverse(
         ast,
         [],
         fn
-          {:defmodule, _meta_mod, children} = ast, acc ->
-            [
-              _aliases_node,
-              [
-                {{:__block__, _meta_block, [:do]},
-                 {:__block__, _meta_inner_block, block_children}}
-              ]
-            ] = children
-
+          {:defmodule, _meta_mod,
+           [
+             {:__aliases__, _meta_aliases, ^module_ast},
+             [{{:__block__, _meta_block, [:do]}, {:__block__, _meta_inner_block, block_children}}]
+           ]} = ast,
+          acc ->
             {ast,
              [
                Enum.find_index(block_children, fn node ->
                  match?(
                    {:def, _meta_def, [{^name_func, _meta_func, _params}, _func_children]},
                    node
-                 )
+                 ) or
+                   match?(
+                     {:def, _meta_def,
+                      [
+                        {:when, _meta_when, [{^name_func, _meta_func, _params}, _when_expr]},
+                        _func_block
+                      ]},
+                     node
+                   )
                end)
                | acc
              ]}
@@ -180,18 +242,29 @@ defmodule Mix.Tasks.LazyDoc do
             {other, acc}
         end,
         fn
-          {:defmodule, meta_mod, children}, [index | rest] ->
-            [
-              aliases_node,
-              [{{:__block__, meta_block, [:do]}, {:__block__, meta_inner_block, block_children}}]
-            ] = children
-
+          {:defmodule, meta_mod,
+           [
+             {:__aliases__, _meta_aliases, ^module_ast} = aliases_node,
+             [{{:__block__, meta_block, [:do]}, {:__block__, meta_inner_block, block_children}}]
+           ]},
+          [index | rest] ->
             new_do_block = [
               {{:__block__, meta_block, [:do]},
                {:__block__, meta_inner_block, List.insert_at(block_children, index, ast_doc)}}
             ]
 
             {{:defmodule, meta_mod, [aliases_node, new_do_block]}, [{index, index + 1} | rest]}
+
+          # Single node module
+          {:defmodule, meta_mod,
+           [
+             {:__aliases__, _meta_aliases, ^module_ast} = aliases_node,
+             [{{:__block__, meta_block, [:do]}, node}]
+           ]} = _ast,
+          acc ->
+            new_do_block = [{{:__block__, meta_block, [:do]}, {:__block__, [], [ast_doc, node]}}]
+
+            {{:defmodule, meta_mod, [aliases_node, new_do_block]}, acc}
 
           other, acc ->
             {other, acc}
@@ -226,23 +299,28 @@ defmodule Mix.Tasks.LazyDoc do
           unescape: false
         )
 
-      names = extract_names(ast) |> join_code_from_clauses()
+      names_per_module =
+        extract_names(ast)
+        |> Enum.map(fn {:module, module_name, module_ast, functions} ->
+          {module_name |> Module.concat(), module_ast, join_code_from_clauses(functions)}
+        end)
 
       modules =
-        Enum.filter(names, fn {whatever, _name} -> whatever == :module end)
-        |> Enum.map(fn {:module, name} -> {:module, Module.concat(name)} end)
+        Enum.map(names_per_module, fn {module_name, _module_ast, _functions} -> module_name end)
 
-      docs_per_module = docs_per_module(modules)
-
-      all_none_function_docs =
-        Enum.reduce(docs_per_module, [], fn {:docs_v1, _annotation, _beam_language, _format,
-                                             _module_doc, _metadata, function_docs},
-                                            acc ->
-          function_docs ++ acc
+      docs_per_module =
+        docs_per_module(modules)
+        |> Enum.map(fn {module, {module_doc, func_docs}} ->
+          {module, {module_doc, group_docs_different_arities(func_docs)}}
         end)
 
       ## Basically filtering the functions just the non documented functions
-      functions = filter_undocumented_functions(names, all_none_function_docs)
+      #
+      functions =
+        Enum.zip(names_per_module, docs_per_module)
+        |> Enum.map(fn {names_module, function_docs_single_module} ->
+          filter_undocumented_functions(names_module, function_docs_single_module)
+        end)
 
       %{
         file: file,
@@ -273,61 +351,87 @@ defmodule Mix.Tasks.LazyDoc do
 
   ## End of the recursion, just 2 elements.
   defp join_code_from_clauses(
-         [{type_1, value_1} = elem_1, {type_2, value_2} = elem_2],
+         [],
+         _acc
+       ) do
+    []
+  end
+
+  defp join_code_from_clauses(
+         [{_type_1, {_name_1, _code_first}} = elem_1],
          acc
        ) do
-    if type_1 == type_2 and type_1 == :function do
-      {name, code_first} = value_1
-      {name_2, code_second} = value_2
+    [elem_1 | acc]
+  end
 
-      if name == name_2 do
-        function = {:function, {name, code_second <> "\n" <> code_first}}
-        [function | acc]
-      else
-        [elem_1, elem_2 | acc]
-      end
+  defp join_code_from_clauses(
+         [{type_1, {name_1, code_first}} = elem_1, {type_2, {name_2, code_second}} = elem_2],
+         acc
+       ) do
+    if name_1 == name_2 do
+      function = resulting_function_merge(type_1, type_2, name_1, code_first, code_second)
+      [function | acc]
     else
       [elem_1, elem_2 | acc]
     end
   end
 
-  ## Recursion case if we have 2 functions a the head of the list.
   defp join_code_from_clauses(
          [
-           {:function, {name, code_first}} = func_1,
-           {:function, {name_2, code_second}} = func_2 | rest
+           {type_1, {name_1, code_first}} = elem_1,
+           {type_2, {name_2, code_second}} = elem_2 | rest
          ],
          acc
        ) do
-    if name == name_2 do
-      function = {:function, {name, code_second <> "\n" <> code_first}}
+    if name_1 == name_2 do
+      function = resulting_function_merge(type_1, type_2, name_1, code_first, code_second)
       join_code_from_clauses([function | rest], acc)
     else
-      join_code_from_clauses([func_2 | rest], [func_1 | acc])
+      join_code_from_clauses([elem_2 | rest], [elem_1 | acc])
     end
   end
 
-  ## Recursion case if we have 2 different types of element.
-  defp join_code_from_clauses(
-         [{:function, {_name, _code_first}} = func_1, {_other_type, _elem} = name | rest],
-         acc
-       ) do
-    join_code_from_clauses([name | rest], [func_1 | acc])
-  end
+  defp resulting_function_merge(type_1, type_2, name, code_first, code_second) do
+    cond do
+      type_1 == :function and type_2 == :function_p ->
+        {:function, {name, code_second <> "\n" <> code_first}}
 
-  ## Recursion case if we have 2 different types of element.
-  defp join_code_from_clauses(
-         [{_other_type, _elem} = name, {:function, {_name, _code_first}} = func_1 | rest],
-         acc
-       ) do
-    join_code_from_clauses([func_1 | rest], [name | acc])
+      type_1 == :function and type_2 == :function ->
+        {:function, {name, code_second <> "\n" <> code_first}}
+
+      type_1 == :function_p and type_2 == :function_p ->
+        {:function_p, {name, code_second <> "\n" <> code_first}}
+
+      type_1 == :function_p and type_2 == :function ->
+        {:function, {name, code_second <> "\n" <> code_first}}
+    end
   end
 
   @doc """
 
   Parameters
 
-  list_nodes - a list containing nodes which may include functions.
+  func_docs - a list of function documentation tuples, where each tuple contains the function name, line number, signature, and documentation string.
+  Description
+   Groups function documentation by their names in order to organize and access documentation for functions with different arities.
+
+  Returns
+   a map where the keys are function names and the values are lists of their corresponding documentation strings.
+    
+  """
+  def group_docs_different_arities(func_docs) do
+    Enum.group_by(
+      func_docs,
+      fn {{:function, name, _arity}, _line, _signature, _docs, %{}} -> name end,
+      fn {{:function, _name, _arity}, _line, _signature, docs, %{}} -> docs end
+    )
+  end
+
+  @doc """
+
+  Parameters
+
+  list_nodes - a list containing nodes which include functions
   list_undocumented_functions - a list of functions identified as undocumented.
 
   Description
@@ -337,34 +441,33 @@ defmodule Mix.Tasks.LazyDoc do
    a list of nodes that are undocumented functions present in list_nodes.
 
   """
-  def filter_undocumented_functions(list_nodes, list_undocumented_functions) do
-    Enum.filter(list_nodes, fn
-      {:function, {name, _stringify}} ->
-        Enum.any?(list_undocumented_functions, fn
-          {{:function, name_to_check, _arity}, _line, _signature, :none, %{}} ->
-            name == name_to_check
+  def filter_undocumented_functions(
+        {module, module_ast, functions},
+        {_mod, {_module_doc, function_docs}}
+      ) do
+    ## Filter the private functions
+    ## we already merged the code if it was necessary
+    ## Filter the functions which at least has one of the clauses documented
+    # even if it is a different arity.
+    #
 
-          {_non_func_node, _line, [], :none, %{}} ->
-            false
-        end)
+    functions =
+      Enum.filter(functions, fn {type, {func_name, _code}} ->
+        type == :function and Enum.all?(function_docs[func_name], fn elem -> elem == :none end)
+      end)
 
-      {_whatever, _something} ->
-        false
-    end)
+    {module, module_ast, functions}
   end
 
-  @spec docs_per_module([{:module, atom()}, ...]) :: [
-          {:docs_v1, annotation, beam_language, format, module_doc :: doc_content, metadata,
-           docs :: [doc_element]},
+  @spec docs_per_module([module(), ...]) :: [
+          {module :: module(), module_doc :: doc_content, docs :: [doc_element]},
           ...
         ]
         when annotation: :erl_anno.anno(),
-             beam_language: :elixir | :erlang | atom(),
              doc_content: %{optional(binary()) => binary()} | :none | :hidden,
              doc_element:
                {{kind :: atom(), function_name :: atom(), arity()}, annotation, signature,
                 doc_content, metadata},
-             format: binary(),
              signature: [binary()],
              metadata: map()
 
@@ -377,27 +480,21 @@ defmodule Mix.Tasks.LazyDoc do
    Retrieves documentation for the given modules, filtering out functions with no documentation.
 
   Returns
-   a list of tuples containing the documentation for each module including only undocumented functions.
+   a list of tuples containing the documentation for each module including functions.
 
   """
   def docs_per_module(modules) do
-    ## fetch docs get the docs info from a module
-    # We should only get the function which does not contain any docs
-    # docs `:hidden` means the programmer put explicitly `@doc false`
-    # docs `map()` it means the is already a docs for this function.
-    # docs `:none` means the script should take this function and give it to the LLM.
+    Enum.map(modules, fn module ->
+      {:docs_v1, _annotation, _beam_language, _format, module_doc, _metadata, function_docs} =
+        Code.fetch_docs(module)
 
-    Enum.map(modules, fn {:module, name} ->
-      {:docs_v1, annotation, beam_language, format, module_doc, metadata, function_docs} =
-        Code.fetch_docs(name)
-
-      ## get only the function docs which are :none
+      ## TO_DO: support @type docs
       function_docs =
-        Enum.filter(function_docs, fn {{_kind, _name, _arity}, _ann, _signature, docs, _meta} ->
-          docs == :none
+        Enum.filter(function_docs, fn {{type, _name, _arity}, _line, _signature, _docs, %{}} ->
+          type == :function
         end)
 
-      {:docs_v1, annotation, beam_language, format, module_doc, metadata, function_docs}
+      {module, {module_doc, function_docs}}
     end)
   end
 
@@ -432,21 +529,9 @@ defmodule Mix.Tasks.LazyDoc do
     model_text = Provider.model(provider_mod, model)
 
     Enum.each(entries, fn entry ->
-      ast_acc =
-        Enum.reduce(entry.functions, entry.ast, fn {:function,
-                                                    {function_atom, function_stringified}},
-                                                   acc_ast ->
-          function_prompt = final_prompt <> function_stringified
-
-          ## TO_DO: probably we should something here instead of just doing :ok
-          {:ok, response} =
-            Provider.request_prompt(provider_mod, function_prompt, model_text, token)
-
-          docs = Provider.get_docs_from_response(provider_mod, response)
-
-          ok? = docs_are_ok?(docs)
-
-          docs_to_node(ok?, docs, acc_ast, function_atom)
+      acc =
+        Enum.reduce(entry.functions, entry.ast, fn mod_tuple, acc ->
+          insert_nodes_in_module(mod_tuple, final_prompt, provider_mod, model_text, token, acc)
         end)
 
       # TO_DO: probably we should check if the ast_acc is the same as entry.ast
@@ -454,12 +539,54 @@ defmodule Mix.Tasks.LazyDoc do
       # A simple but effective will be if entry.functions is empty
       # Do not write the file.
 
-      write_to_file_formatted(entry.file, ast_acc, entry.comments)
+      write_to_file_formatted(entry.file, acc, entry.comments)
+    end)
+  end
+
+  @doc """
+
+  Parameters
+
+  _module - the module to which the nodes will be inserted.
+  module_ast - the abstract syntax tree of the module.
+  functions - a list of functions to be processed.
+  final_prompt - a string prompt to be appended to each function's prompt.
+  provider_mod - the module responsible for making requests to the provider.
+  model_text - the text representation of the model used in the request.
+  token - the authentication token for the provider.
+  acc - the accumulator for building the updated abstract syntax tree.
+
+  Description
+   Inserts nodes into a module based on provided functions and prompts.
+
+  Returns
+   the updated abstract syntax tree after processing the functions.
+
+  """
+  def insert_nodes_in_module(
+        {_module, module_ast, functions},
+        final_prompt,
+        provider_mod,
+        model_text,
+        token,
+        acc
+      ) do
+    Enum.reduce(functions, acc, fn {:function, {function_atom, function_stringified}}, acc_ast ->
+      function_prompt = final_prompt <> function_stringified
+
+      ## TO_DO: probably we should something here instead of just doing :ok
+      {:ok, response} = Provider.request_prompt(provider_mod, function_prompt, model_text, token)
+
+      docs = Provider.get_docs_from_response(provider_mod, response)
+
+      ok? = docs_are_ok?(docs)
+
+      docs_to_node(ok?, docs, acc_ast, function_atom, module_ast)
     end)
   end
 
   @doc false
-  def docs_to_node(true, docs, acc_ast, function_atom) do
+  def docs_to_node(true, docs, acc_ast, function_atom, module_ast) do
     result =
       Code.string_to_quoted_with_comments(docs,
         literal_encoder: &{:ok, {:__block__, &2, [&1]}},
@@ -469,7 +596,7 @@ defmodule Mix.Tasks.LazyDoc do
 
     case result do
       {:ok, node, _} ->
-        insert_doc_for_function(acc_ast, function_atom, node)
+        insert_doc_for_function(acc_ast, function_atom, node, module_ast)
 
       {:error, reason} ->
         Logger.error("Cannot parse the response as an Elixir AST: #{inspect(reason)}")

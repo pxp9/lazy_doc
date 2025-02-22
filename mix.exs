@@ -56,7 +56,7 @@ defmodule LazyDoc.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:dotenv, "~> 3.0.0", only: [:dev]},
+      {:dotenv, "~> 3.0.0", only: [:dev, :test]},
       {:req, "~> 0.4.0"},
       {:jason, "~> 1.0"},
       ## Testing and converalls
