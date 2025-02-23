@@ -28,7 +28,11 @@ defmodule LazyDoc.TaskTest do
          ]}
       ]
 
-    name_extraction = LazyDoc.extract_names(ast)
+    name_extraction =
+      LazyDoc.extract_names(ast)
+      |> Enum.map(fn {:module, mod, mod, _code_mod, functions} ->
+        {:module, mod, mod, functions}
+      end)
 
     assert name_extraction == expected_names
 
@@ -126,10 +130,10 @@ defmodule LazyDoc.TaskTest do
 
     name_module =
       LazyDoc.extract_names(ast)
-      |> Enum.map(fn {:module, module_name, module_ast, functions} ->
-        {module_name |> Module.concat(), module_ast, LazyDoc.join_code_from_clauses(functions)}
+      |> Enum.map(fn {:module, module_name, module_ast, code_mod, functions} ->
+        {module_name |> Module.concat(), module_ast, code_mod, LazyDoc.join_code_from_clauses(functions)}
       end)
-      |> Enum.find(fn {module_name, _module_ast, _functions} ->
+      |> Enum.find(fn {module_name, _module_ast, _code_mod, _functions} ->
         module_name == LazyDoc.ExampleModule
       end)
 

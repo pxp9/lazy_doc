@@ -18,7 +18,9 @@ defmodule LazyDoc do
    a list of maps containing details about each file, including the content, AST, modules, functions, and comments extracted.
 
   """
-  def extract_data_from_files(path_wildcard) do
+  def extract_data_from_files() do
+    path_wildcard = Application.get_env(:lazy_doc, :path_wildcard, "lib/**/*.ex")
+
     Path.wildcard(path_wildcard)
     |> Enum.map(fn file ->
       # this task is for dev purposes so if we do not have a success reading a file is weird.
@@ -33,35 +35,41 @@ defmodule LazyDoc do
 
       names_per_module =
         extract_names(ast)
-        |> Enum.map(fn {:module, module_name, module_ast, functions} ->
-          {module_name |> Module.concat(), module_ast, join_code_from_clauses(functions)}
+        |> Enum.map(fn {:module, module_name, module_ast, code_mod, functions} ->
+          {module_name |> Module.concat(), module_ast, code_mod,
+           join_code_from_clauses(functions)}
         end)
 
-      modules =
-        Enum.map(names_per_module, fn {module_name, _module_ast, _functions} -> module_name end)
+      modules_to_fetch_docs =
+        Enum.map(names_per_module, fn {module_name, _module_ast, _code_mod, _functions} ->
+          module_name
+        end)
 
       docs_per_module =
-        docs_per_module(modules)
+        docs_per_module(modules_to_fetch_docs)
         |> Enum.map(fn {module, {module_doc, func_docs}} ->
           {module, {module_doc, group_docs_different_arities(func_docs)}}
         end)
 
-      ## Basically filtering the functions just the non documented functions
-      #
-      functions =
+      zip_to_process =
         Enum.zip(names_per_module, docs_per_module)
-        |> Enum.map(fn {names_module, function_docs_single_module} ->
+
+      ## Basically filtering the functions just the non documented functions
+      functions =
+        Enum.map(zip_to_process, fn {names_module, function_docs_single_module} ->
           filter_undocumented_functions(names_module, function_docs_single_module)
         end)
+
+      modules =
+        filter_undocumented_modules(zip_to_process)
 
       %{
         file: file,
         content: content,
         lines: String.split(content, "\n") |> Stream.map(&String.trim/1) |> Enum.with_index(),
         ast: ast,
-        modules: modules,
         functions: functions,
-        docs_per_module: docs_per_module,
+        modules: modules,
         comments: comments
       }
     end)
@@ -161,22 +169,22 @@ defmodule LazyDoc do
   end
 
   defp extract_names(
-         {:defmodule, _meta, [{:__aliases__, _meta_aliases, module_name}, children]},
+         {:defmodule, _meta, [{:__aliases__, _meta_aliases, module_name}, children]} = ast_mod,
          acc
        ) do
     children_names = extract_names(children, [])
 
     {modules, funcs} =
       Enum.split_with(children_names, fn elem ->
-        match?({:module, _name, _name_ast, _children}, elem)
+        match?({:module, _name, _name_ast, _code_mod, _children}, elem)
       end)
 
     modules =
-      Enum.map(modules, fn {:module, name, name_ast, child_module_children} ->
-        {:module, module_name ++ name, name_ast, child_module_children}
+      Enum.map(modules, fn {:module, name, name_ast, code_mod, child_module_children} ->
+        {:module, module_name ++ name, name_ast, code_mod, child_module_children}
       end)
 
-    [{:module, module_name, module_name, funcs} | acc] ++ modules
+    [{:module, module_name, module_name, Macro.to_string(ast_mod), funcs} | acc] ++ modules
   end
 
   defp extract_names({:defprotocol, _meta, [protocol_name, _]}, acc) do
@@ -271,14 +279,13 @@ defmodule LazyDoc do
 
   """
   def filter_undocumented_functions(
-        {module, module_ast, functions},
+        {module, module_ast, _code_mod, functions},
         {_mod, {_module_doc, function_docs}}
       ) do
     ## Filter the private functions
     ## we already merged the code if it was necessary
     ## Filter the functions which at least has one of the clauses documented
     # even if it is a different arity.
-    #
 
     functions =
       Enum.filter(functions, fn {type, {func_name, _code}} ->
@@ -286,6 +293,30 @@ defmodule LazyDoc do
       end)
 
     {module, module_ast, functions}
+  end
+
+  @doc """
+
+  ## Parameters
+
+  - zip_to_process - a list of tuples containing module information and their documentation.
+
+  ## Description
+  Filters the given list of modules and returns those that do not have associated documentation.
+
+  ## Returns
+  A list of tuples containing modules and their respective AST and code without documentation.
+
+  """
+  def filter_undocumented_modules(zip_to_process) do
+    Enum.filter(zip_to_process, fn
+      {_names_module, {_mod, {module_doc, _function_docs}}} ->
+        module_doc == :none
+    end)
+    |> Enum.map(fn
+      {{module, module_ast, code_mod, _functions}, _function_docs_single_module} ->
+        {module, module_ast, code_mod}
+    end)
   end
 
   @spec docs_per_module([module(), ...]) :: [

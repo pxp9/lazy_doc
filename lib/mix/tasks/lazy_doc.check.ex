@@ -1,4 +1,14 @@
 defmodule Mix.Tasks.LazyDoc.Check do
+  @moduledoc """
+
+   ## Main functionality
+
+   The module Mix.Tasks.LazyDoc.Check is designed to facilitate the checking of documentation for functions and modules within a codebase using the LazyDoc application.
+
+   ## Description
+
+   It initializes the LazyDoc application, identifies undocumented functions and modules across specified files, and exits with an appropriate status code based on the presence of undocumented elements. Warnings are logged for any undocumented functions and modules encountered during the check.
+  """
   require Logger
   use Mix.Task
 
@@ -17,12 +27,11 @@ defmodule Mix.Tasks.LazyDoc.Check do
   def run(_command_line_args) do
     _result = LazyDoc.Application.start("", "")
 
-    path_wildcard = Application.get_env(:lazy_doc, :path_wildcard, "lib/**/*.ex")
-
     values =
-      LazyDoc.extract_data_from_files(path_wildcard)
+      LazyDoc.extract_data_from_files()
       |> Enum.map(fn entry ->
-        get_undocumented_functions(entry.functions, entry.file) != []
+        get_undocumented_functions(entry.functions, entry.file) != [] or
+          get_undocumented_modules(entry.modules, entry.file)
       end)
 
     if Enum.any?(values, fn val -> val end) do
@@ -77,5 +86,32 @@ defmodule Mix.Tasks.LazyDoc.Check do
     end)
 
     Logger.info("file: #{file}")
+  end
+
+  @doc """
+
+  ## Parameters
+
+  - modules - a list of modules to check for documentation.
+  - file - the name of the file where the modules are located.
+
+  ## Description
+   Checks if the provided modules are documented and logs warnings for any undocumented modules.
+
+  ## Returns
+   true if there are undocumented modules, false otherwise.
+
+  """
+  def get_undocumented_modules(modules, file) do
+    if modules != [] do
+      Enum.each(modules, fn {mod, _mod_ast, _cod} ->
+        Logger.warning("Module `#{mod}` needs to be documented")
+        Logger.info("file: #{file}")
+      end)
+
+      true
+    else
+      false
+    end
   end
 end

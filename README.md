@@ -7,11 +7,9 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 
 ## Roadmap
 
-- Make AI docs for modules as well, `@module_doc`.
 - Inspect the `defimpl` and `defprotocol` nodes.
 - Customizable number of retries.
 - Custom paramters to pass the model (max\_tokens, top\_p, temperature).
-- Run mix format after writing the files, just in case.
 
 ## Installation
 
@@ -30,6 +28,9 @@ end
 ``` elixir
 ## alias of GithubAi above
 config :lazy_doc, :provider, {GithubAi, :gpt_4o_mini}
+
+## configure formatter.
+config :lazy_doc, :line_length, 98
 
 config :lazy_doc,
        :custom_function_prompt,
