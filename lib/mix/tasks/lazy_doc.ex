@@ -68,21 +68,29 @@ defmodule Mix.Tasks.LazyDoc do
   end
 
   @doc """
-  write to given file the given Elixir AST
-  it writes formmated the string if the Elixir AST is annotated properly.
-  if the AST is taken from a string you should use this options:
 
+  ## Parameters
 
-  literal_encoder: &{:ok, {:__block__, &2, [&1]}},
-  token_metadata: true,
-  unescape: false
+  - file - the name of the file where the formatted content will be written.
+  - ast - the abstract syntax tree representation of the code to be written.
+  - comments - optional comments to include with the formatted output.
+
+  ## Description
+   Formats the given abstract syntax tree (AST) and writes it to the specified file, including any provided comments.
+
+  ## Returns
+   :ok if the write operation is successful, or {:error, reason} if it fails.
+
   """
-
   def write_to_file_formatted(file, ast, comments) do
+    line_length = Application.get_env(:lazy_doc, :line_length, 98)
+
     to_write =
       Code.quoted_to_algebra(ast, comments: comments, escape: false)
-      |> Inspect.Algebra.format(:infinity)
+      |> Inspect.Algebra.format(line_length)
       |> IO.iodata_to_binary()
+
+    to_write = to_write <> "\n"
 
     File.write(file, to_write)
   end
