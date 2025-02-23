@@ -12,9 +12,6 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 - Customizable number of retries.
 - Custom paramters to pass the model (max\_tokens, top\_p, temperature).
 - Run mix format after writing the files, just in case.
-- Improve the default prompt to generate markdown syntax.
-- Make a task or an arg in the current task to check if the functions are
-  documented. (allows CI usage)
 
 ## Installation
 
@@ -63,9 +60,17 @@ mix lazy_doc
 
 I would recommend to run a `mix format` after just in case.
 
+If you want, you can add a simple check to see what needs to be documented in
+your project. This is good for CI.
+
+``` bash
+mix lazy_doc.check
+```
+
 ## Known limitations that wont be fixed.
 
 ### Module names in the same file must be different.
+
 If the user creates an inner module with the same name as the parent module
 `lazy_doc`, it wont work properly because they have the same `:__aliases__` AST
 node.

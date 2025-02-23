@@ -86,6 +86,10 @@ jobs:
         run: mix credo --strict
         if: ${{ matrix.lint }}
 
+      - name: Run lazy_doc check
+        run: mix lazy_doc.check
+        if: ${{ matrix.lint }}
+        
       - name: Run mix test
         run: mix test
 
