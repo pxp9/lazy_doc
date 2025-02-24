@@ -60,7 +60,7 @@ defmodule LazyDoc.Provider do
   @callback model(model :: atom()) :: binary()
   @spec model(callback_module :: module(), model :: atom()) :: binary()
   @doc """
-    
+
   Parameters
 
   callback_module - a module that contains the model function to be invoked.
@@ -70,7 +70,12 @@ defmodule LazyDoc.Provider do
 
   Returns
    the result from the callback module's model function.
-    
+
   """
   def model(callback_module, model), do: callback_module.model(model)
+
+  @callback check_parameters?(params :: keyword()) :: boolean()
+  @spec check_parameters?(callback_module :: module(), params :: keyword()) :: boolean()
+  def check_parameters?(callback_module, params), do: callback_module.check_parameters?(params)
+
 end

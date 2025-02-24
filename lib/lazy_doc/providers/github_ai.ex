@@ -18,7 +18,7 @@ defmodule LazyDoc.Providers.GithubAi do
   @spec request_prompt(binary(), binary(), binary()) ::
           {:ok, Req.Response.t()} | {:error, Exception.t()}
   @doc """
-    
+
   Parameters
 
   prompt - the input message to be processed by the model.
@@ -90,7 +90,7 @@ defmodule LazyDoc.Providers.GithubAi do
 
   @spec model(atom()) :: binary()
   @doc """
-   
+
   Parameters
 
   model - a symbol representing the model type.
@@ -99,7 +99,7 @@ defmodule LazyDoc.Providers.GithubAi do
 
   Returns
    the string representation of the specified model.
-   
+
   """
   def model(model) do
     case model do
@@ -107,5 +107,11 @@ defmodule LazyDoc.Providers.GithubAi do
       :gpt_4o -> "gpt-4o"
       :gpt_4o_mini -> "gpt-4o-mini"
     end
+  end
+
+  @spec check_parameters?(params :: keyword()) :: boolean()
+  def check_parameters?(params) do
+    valid_params = [:max_tokens, :top_p, :temperature]
+    Enum.map(params, fn {key, _value} -> key in valid_params end) |> Enum.all?
   end
 end
