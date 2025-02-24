@@ -7,11 +7,25 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 
 ## Roadmap
 
-- Make AI docs for modules as well, `@module_doc`.
-- Inspect the `defimpl` and `defprotocol` nodes.
-- Customizable number of retries.
-- Custom paramters to pass the model (max\_tokens, top\_p, temperature).
-- Run mix format after writing the files, just in case.
+- [X] Make AI docs for functions `@doc`.
+- [X] Simple check if the response is in `@doc` format.
+- [X] Make AI providers more extensible (define a behavior, what an AI provider
+  should do ?).
+- [X] Custom path wildcard (limits the action of `lazy_doc`)
+- [X] Make some unit tests.
+- [X] Improve the default prompt to generate markdown syntax.
+- [X] Fix inner module detection (creates scopes for inner modules and builds
+  the full name of the inner module).
+- [X] Make a task or an arg in the current task to check if the functions are
+  documented. (allows CI usage)
+- [X] File is written to file according to Elixir formatter.
+- [X] Make AI docs for modules as well, `@moduledoc`.
+- [X] Custom prompts for function and module.
+- [ ] Simple check if the response is in `@moduledoc` format.
+- [ ] Customizable number of retries.
+- [ ] Custom paramters to pass the provider (max\_tokens, top\_p, temperature).
+- [ ] Check if custom paramters are valid for that provider.
+- [ ] Inspect the `defimpl` and `defprotocol` nodes.
 
 ## Installation
 
@@ -30,6 +44,9 @@ end
 ``` elixir
 ## alias of GithubAi above
 config :lazy_doc, :provider, {GithubAi, :gpt_4o_mini}
+
+## configure formatter.
+config :lazy_doc, :line_length, 98
 
 config :lazy_doc,
        :custom_function_prompt,

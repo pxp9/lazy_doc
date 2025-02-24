@@ -1,10 +1,22 @@
 defmodule Mix.Tasks.LazyDoc do
+  @moduledoc """
+
+   ## Main functionality
+
+   The module Mix.Tasks.LazyDoc provides a Mix task for processing source files to extract and format documentation for Elixir modules and functions.
+
+   ## Description
+
+   It enables the extraction of documentation using AI to enhance the documentation generation process, verifying and formatting documentation as per specified requirements. It handles reading the source code, interacting with a provider for documentation prompts, and writing the results back in a structured format.
+  """
   alias LazyDoc.Provider
 
   require Logger
   use Mix.Task
 
   @default_function_prompt ~s(You should describe the parameters based on the spec given and give a small description of the following function.\n\nPlease do it in the following format given as an example, important do not return the header of the function, do not return a explanation of the function, your output must be only the docs in the following format.\n\n@doc """\n\n## Parameters\n\n- transaction_id - foreign key of the Transactions table.\n## Description\n Performs a search in the database\n\n## Returns\n the Transaction corresponding to transaction_id\n\n"""\n\nFunction to document:\n)
+
+  @default_module_prompt ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\n ## Main functionality\n\n The module GithubAi provides a way of communicating with Github AI API.\n\n ## Description\n\n It implements the behavior Provider a standard way to use a provider in LazyDoc.\n"""\n\nModule to document:\n)
 
   @doc """
 
@@ -27,20 +39,11 @@ defmodule Mix.Tasks.LazyDoc do
 
     _result = LazyDoc.Application.start("", "")
 
-    {provider_mod, model} = Application.get_env(:lazy_doc, :provider)
-
-    final_prompt =
-      Application.get_env(:lazy_doc, :custom_function_prompt, @default_function_prompt)
-
     ## Runs the runtime.exs from the client
     Mix.Task.run("app.config")
 
-    token = Application.get_env(:lazy_doc, :token)
-
-    path_wildcard = Application.get_env(:lazy_doc, :path_wildcard, "lib/**/*.ex")
-
-    LazyDoc.extract_data_from_files(path_wildcard)
-    |> proccess_files(final_prompt, provider_mod, model, token)
+    LazyDoc.extract_data_from_files()
+    |> proccess_files()
   end
 
   @doc """
@@ -173,32 +176,46 @@ defmodule Mix.Tasks.LazyDoc do
   Description
    A list of entries to process, transforming functions based on model responses.
 
-  final_prompt - a string prefix to be added to each function's prompt.
-  Description
-   The initial text that precedes the function's string representation in the prompt.
-
-  provider_mod - a module responsible for handling requests to the provider.
-  Description
-   The module which encapsulates the logic for interacting with the AI provider's API.
-
-  model - the model identifier used to request AI-generated documentation.
-  Description
-   Specifies which AI model to use for generating the required documentation.
-
-  token - an authorization token for the API requests.
-  Description
-   The security token needed to authenticate requests to the provider's API.
-
   Returns
    None
   """
-  def proccess_files(entries, final_prompt, provider_mod, model, token) do
+  def proccess_files(entries) do
+    {provider_mod, model} = Application.get_env(:lazy_doc, :provider)
+
+    final_function_prompt =
+      Application.get_env(:lazy_doc, :custom_function_prompt, @default_function_prompt)
+
+    final_module_prompt =
+      Application.get_env(:lazy_doc, :custom_module_prompt, @default_module_prompt)
+
+    token = Application.get_env(:lazy_doc, :token)
+
     model_text = Provider.model(provider_mod, model)
 
     Enum.each(entries, fn entry ->
       acc =
-        Enum.reduce(entry.functions, entry.ast, fn mod_tuple, acc ->
-          insert_nodes_in_module(mod_tuple, final_prompt, provider_mod, model_text, token, acc)
+        Enum.reduce(entry.modules, entry.ast, fn {_mod, mod_ast, code_mod}, acc_ast ->
+          function_prompt = final_module_prompt <> code_mod
+          ## TO_DO: probably we should something here instead of just doing :ok
+          {:ok, response} =
+            Provider.request_prompt(provider_mod, function_prompt, model_text, token)
+
+          docs = Provider.get_docs_from_response(provider_mod, response)
+
+          # TO_DO: check if the @module_doc is ok
+          docs_to_module_doc_node(docs, acc_ast, mod_ast)
+        end)
+
+      acc =
+        Enum.reduce(entry.functions, acc, fn mod_tuple, acc_ast ->
+          insert_nodes_in_module(
+            mod_tuple,
+            final_function_prompt,
+            provider_mod,
+            model_text,
+            token,
+            acc_ast
+          )
         end)
 
       # TO_DO: probably we should check if the ast_acc is the same as entry.ast
@@ -276,5 +293,90 @@ defmodule Mix.Tasks.LazyDoc do
     Logger.error(
       "docs are in a wrong format review your prompt\n\n this was returned by the AI: #{docs}"
     )
+  end
+
+  @doc """
+
+  ## Parameters
+
+  - docs - the documentation string to be converted to an abstract syntax tree (AST).
+  - acc_ast - the accumulator AST to which the new documentation will be added.
+  - module_ast - the AST of the module where the documentation will be inserted.
+
+  ## Description
+   Converts a documentation string into an Elixir AST and inserts it into the specified module's AST.
+
+  ## Returns
+   the updated accumulator AST after inserting the new documentation.
+  """
+  def docs_to_module_doc_node(docs, acc_ast, module_ast) do
+    result =
+      Code.string_to_quoted_with_comments(docs,
+        literal_encoder: &{:ok, {:__block__, &2, [&1]}},
+        token_metadata: true,
+        unescape: false
+      )
+
+    case result do
+      {:ok, node, _} ->
+        insert_module_doc(acc_ast, module_ast, node)
+
+      {:error, reason} ->
+        Logger.error("Cannot parse the response as an Elixir AST: #{inspect(reason)}")
+        acc_ast
+    end
+  end
+
+  @doc """
+
+  ## Parameters
+
+  - ast - the Abstract Syntax Tree (AST) representing the module structure.
+  - module_ast - the AST representation of the specific module to be modified.
+  - ast_doc - a documentation string or AST node to be inserted into the module.
+
+  ## Description
+  Inserts documentation into a specified module in the AST by traversing and modifying the module's structure.
+
+  ## Returns
+  The modified AST with the new documentation inserted.
+
+  """
+  def insert_module_doc(ast, module_ast, ast_doc) do
+    {new_ast, _acc} =
+      Macro.prewalk(
+        ast,
+        [],
+        fn
+          {:defmodule, meta_mod,
+           [
+             {:__aliases__, _meta_aliases, ^module_ast} = aliases_node,
+             [{{:__block__, meta_block, [:do]}, {:__block__, meta_inner_block, block_children}}]
+           ]},
+          acc ->
+            new_do_block = [
+              {{:__block__, meta_block, [:do]},
+               {:__block__, meta_inner_block, [ast_doc | block_children]}}
+            ]
+
+            {{:defmodule, meta_mod, [aliases_node, new_do_block]}, [:complex_mod | acc]}
+
+          # Single node module
+          {:defmodule, meta_mod,
+           [
+             {:__aliases__, _meta_aliases, ^module_ast} = aliases_node,
+             [{{:__block__, meta_block, [:do]}, node}]
+           ]} = _ast,
+          acc ->
+            new_do_block = [{{:__block__, meta_block, [:do]}, {:__block__, [], [ast_doc, node]}}]
+
+            {{:defmodule, meta_mod, [aliases_node, new_do_block]}, [:simple_mod | acc]}
+
+          other, acc ->
+            {other, acc}
+        end
+      )
+
+    new_ast
   end
 end
