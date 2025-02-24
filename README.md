@@ -23,8 +23,8 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 - [X] Custom prompts for function and module.
 - [ ] Simple check if the response is in `@moduledoc` format.
 - [ ] Customizable number of retries.
-- [ ] Custom paramters to pass the provider (max\_tokens, top\_p, temperature).
-- [ ] Check if custom paramters are valid for that provider.
+- [X] Custom paramters to pass the provider (max\_tokens, top\_p, temperature).
+- [X] Check if custom paramters are valid for that provider.
 - [ ] Inspect the `defimpl` and `defprotocol` nodes.
 
 ## Installation

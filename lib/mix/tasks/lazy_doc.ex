@@ -180,7 +180,7 @@ defmodule Mix.Tasks.LazyDoc do
    None
   """
   def proccess_files(entries) do
-    {provider_mod, model} = Application.get_env(:lazy_doc, :provider)
+    {provider_mod, model, params} = Application.get_env(:lazy_doc, :provider)
 
     final_function_prompt =
       Application.get_env(:lazy_doc, :custom_function_prompt, @default_function_prompt)
@@ -192,13 +192,17 @@ defmodule Mix.Tasks.LazyDoc do
 
     model_text = Provider.model(provider_mod, model)
 
+    if not Provider.check_parameters?(provider_mod, params) do
+      raise ArgumentError, message: "Invalid parameters for this provider #{inspect(params)}"
+    end
+
     Enum.each(entries, fn entry ->
       acc =
         Enum.reduce(entry.modules, entry.ast, fn {_mod, mod_ast, code_mod}, acc_ast ->
           function_prompt = final_module_prompt <> code_mod
           ## TO_DO: probably we should something here instead of just doing :ok
           {:ok, response} =
-            Provider.request_prompt(provider_mod, function_prompt, model_text, token)
+            Provider.request_prompt(provider_mod, function_prompt, model_text, token, params)
 
           docs = Provider.get_docs_from_response(provider_mod, response)
 
@@ -214,6 +218,7 @@ defmodule Mix.Tasks.LazyDoc do
             provider_mod,
             model_text,
             token,
+            params,
             acc_ast
           )
         end)
@@ -253,13 +258,15 @@ defmodule Mix.Tasks.LazyDoc do
         provider_mod,
         model_text,
         token,
+        params,
         acc
       ) do
     Enum.reduce(functions, acc, fn {:function, {function_atom, function_stringified}}, acc_ast ->
       function_prompt = final_prompt <> function_stringified
 
       ## TO_DO: probably we should something here instead of just doing :ok
-      {:ok, response} = Provider.request_prompt(provider_mod, function_prompt, model_text, token)
+      {:ok, response} =
+        Provider.request_prompt(provider_mod, function_prompt, model_text, token, params)
 
       docs = Provider.get_docs_from_response(provider_mod, response)
 
