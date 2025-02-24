@@ -27,6 +27,26 @@ defmodule LazyDoc.Providers.GithubAiTest do
     assert ~s(@doc """\n #{prompt} \n""") == docs
   end
 
+  # Works with Req > 0.5
+
+  # test "test unsueccessful call to provider" do
+  #   model = Provider.model(GithubAi, :gpt_4o_mini)
+
+  #   assert model == "gpt-4o-mini"
+  #   token = "TOKEN"
+  #   prompt = "some prompt"
+
+  #   Req.Test.stub(GithubAi, fn conn ->
+  #     conn
+  #     |> Req.Test.transport_error(:timeout)
+  #   end)
+
+  #   req = GithubAi.req_query(prompt, model, token)
+  #   req = Req.merge(req, plug: {Req.Test, GithubAi})
+
+  #   assert {:error, %Req.TransportError{reason: :timeout}} == req |> Req.post() |> dbg
+  # end
+
   def example_response(prompt) do
     %{
       "choices" => [
