@@ -27,7 +27,7 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 - [X] Check if custom paramters are valid for that provider.
 - [ ] Inspect the `defimpl` and `defprotocol` nodes.
 
-## Installation 
+## Installation
 
 ``` elixir
 def deps do
