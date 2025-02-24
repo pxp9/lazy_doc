@@ -12,6 +12,8 @@ config :lazy_doc, :provider, {GithubAi, :gpt_4o_mini, [max_tokens: 2048, top_p: 
 
 config :lazy_doc, :max_retries, 3
 
+config :lazy_doc, :receive_timeout, 15_000
+
 config :lazy_doc, :line_length, 98
 
 config :lazy_doc,
