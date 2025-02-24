@@ -57,7 +57,7 @@ defmodule LazyDoc.MixProject do
   defp deps do
     [
       {:dotenv, "~> 3.0.0", only: [:dev, :test]},
-      {:req, "~> 0.4.0"},
+      {:req, "~> 0.5.8"},
       {:jason, "~> 1.0"},
       ## Testing and converalls
       {:plug, "~> 1.0", only: :test},
