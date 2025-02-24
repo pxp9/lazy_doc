@@ -1,9 +1,13 @@
 defmodule LazyDoc do
   @moduledoc """
-  Documentation for `LazyDoc`.
 
-  This module is intended to contain shared functions between tasks.
+   ## Main functionality
 
+   The module LazyDoc provides a way to extract and organize documentation from Elixir source files by reading them, parsing their abstract syntax tree (AST), and collecting relevant information about modules, functions, and comments.
+
+   ## Description
+
+   It implements functions to read files matching a given path pattern, extract their AST and comments, group function definitions by names and arities, filter out undocumented functions and modules, and retrieve associated documentation for the extracted modules. The module serves as a utility for generating or managing documentation for Elixir projects.
   """
 
   @doc """
@@ -23,7 +27,7 @@ defmodule LazyDoc do
 
     Path.wildcard(path_wildcard)
     |> Enum.map(fn file ->
-      # this task is for dev purposes so if we do not have a success reading a file is weird.
+      # this task is for dev purposes so if we do not have a success read, it is weird.
       {:ok, content} = File.read(file)
 
       {:ok, ast, comments} =
