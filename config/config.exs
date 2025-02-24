@@ -8,7 +8,9 @@ _ = """
 
 """
 
-config :lazy_doc, :provider, {GithubAi, :gpt_4o_mini, [max_tokens: 2048, top_p: 1, temperature: 1]}
+config :lazy_doc,
+       :provider,
+       {GithubAi, :gpt_4o_mini, [max_tokens: 2048, top_p: 1, temperature: 1]}
 
 config :lazy_doc, :max_retries, 3
 

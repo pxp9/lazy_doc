@@ -67,7 +67,12 @@ defmodule LazyDoc.Providers.GithubAi do
       top_p: top_p
     }
 
-    Req.new(base_url: @github_ai_endpoint, json: body, receive_timeout: receive_timeout, max_retries: max_retries)
+    Req.new(
+      base_url: @github_ai_endpoint,
+      json: body,
+      receive_timeout: receive_timeout,
+      max_retries: max_retries
+    )
     |> Req.Request.put_header("Accept", "application/json")
     |> Req.Request.put_header("Content-Type", "application/json;charset=UTF-8")
     |> Req.Request.put_header("Authorization", "Bearer #{token}")
