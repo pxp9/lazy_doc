@@ -26,6 +26,13 @@ provider which is a tuple of two elements `{GithubAi, :codestral}`.
 - [X] Custom paramters to pass the provider (max\_tokens, top\_p, temperature).
 - [X] Check if custom paramters are valid for that provider.
 - [ ] Inspect the `defimpl` and `defprotocol` nodes.
+- [ ] Make `@moduledoc` documentation take data from the Modules is related the
+  given module.
+- [ ] Spec mode: Detect if a function does not have any `@specs` and try to
+  generate their specs.
+- [ ] Make an option `external_docs` to do `@doc
+  File.read!("file_gen_by_lazy_doc.md")`, this will prevent code redability
+  issues, it will create a folder where all the docs is generated.
 
 ## Installation
 
