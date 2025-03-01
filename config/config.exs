@@ -10,7 +10,7 @@ _ = """
 
 config :lazy_doc,
   patterns: [
-   ~r"^lib/[a-zA-Z_]+(?:/[a-zA-Z_]+)*/[a-zA-Z_]+\.ex$",
+    ~r"^lib/[a-zA-Z_]+(?:/[a-zA-Z_]+)*/[a-zA-Z_]+\.ex$"
   ],
   max_retries: 3,
   receive_timeout: 15_000,

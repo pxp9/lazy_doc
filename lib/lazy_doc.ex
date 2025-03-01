@@ -24,14 +24,17 @@ defmodule LazyDoc do
   """
   @global_path "lib/**/*.ex"
   def extract_data_from_files() do
-    patterns = Application.get_env(:lazy_doc, :patterns, [~r"^lib/[a-zA-Z_]+(?:/[a-zA-Z_]+)*/[a-zA-Z_]+\.ex$"])
+    patterns =
+      Application.get_env(:lazy_doc, :patterns, [
+        ~r"^lib/[a-zA-Z_]+(?:/[a-zA-Z_]+)*/[a-zA-Z_]+\.ex$"
+      ])
 
     Path.wildcard(@global_path)
     |> Enum.filter(fn path ->
       Enum.any?(patterns, fn regex ->
         Regex.match?(regex, path)
       end)
-    end )
+    end)
     |> Enum.map(fn file ->
       # this task is for dev purposes so if we do not have a success read, it is weird.
       {:ok, content} = File.read(file)
