@@ -71,7 +71,7 @@ config :lazy_doc,
        :custom_module_prompt,
        ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\n ## Main functionality\n\n The module GithubAi provides a way of communicating with Github AI API.\n\n ## Description\n\n It implements the behavior Provider a standard way to use a provider in LazyDoc.\n"""\n\nModule to document:\n)
 
-config :lazy_doc, :path_wildcard, "lib/**/*.ex"
+config :lazy_doc, :patterns, "lib/**/*.ex"
 ```
 
 `config/runtime.exs`
