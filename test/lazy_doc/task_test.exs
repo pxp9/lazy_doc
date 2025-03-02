@@ -175,7 +175,8 @@ defmodule LazyDoc.TaskTest do
 
     function_name = :hihi
 
-    new_ast = TaskLazyDoc.docs_to_node(true, docs, ast, function_name, [:LazyDoc, :ExampleModule])
+    ## Expects always elixir @doc valid annotation
+    new_ast = TaskLazyDoc.docs_to_node(docs, ast, function_name, [:LazyDoc, :ExampleModule])
 
     ## Check if the AST has @doc node before the :hihi node
 

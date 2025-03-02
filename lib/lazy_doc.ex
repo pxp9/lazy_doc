@@ -26,7 +26,7 @@ defmodule LazyDoc do
   def extract_data_from_files() do
     patterns =
       Application.get_env(:lazy_doc, :patterns, [
-        ~r"^lib/[a-zA-Z_]+(?:/[a-zA-Z_]+)*/[a-zA-Z_]+\.ex$"
+        ~r"^lib(?:/[a-zA-Z_]+)*/[a-zA-Z_]+\.ex$"
       ])
 
     Path.wildcard(@global_path)
@@ -88,16 +88,7 @@ defmodule LazyDoc do
     end)
   end
 
-  @doc """
-  Parameters
-
-  names - a list of tuples where each tuple contains a type and a value. The type indicates the kind of element (e.g., :function) and the value is related to that type.
-  Description
-   Joins code from function clauses based on their names, merging the code of functions with the same name.
-
-  Returns
-   a list of elements where functions with the same name are combined into a single tuple with their code concatenated.
-  """
+  @doc File.read!("lazy_doc/lazy_doc/join_code_from_clauses.md")
   def join_code_from_clauses(names) do
     join_code_from_clauses(names, [])
   end

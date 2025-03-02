@@ -14,7 +14,7 @@ defmodule Mix.Tasks.LazyDoc do
   require Logger
   use Mix.Task
 
-  @default_function_prompt ~s(You should describe the parameters based on the spec given and give a small description of the following function.\n\nPlease do it in the following format given as an example, important do not return the header of the function, do not return a explanation of the function, your output must be only the docs in the following format.\n\n@doc """\n\n## Parameters\n\n- transaction_id - foreign key of the Transactions table.\n## Description\n Performs a search in the database\n\n## Returns\n the Transaction corresponding to transaction_id\n\n"""\n\nFunction to document:\n)
+  @default_function_prompt ~s(You should describe the parameters based on the spec given and give a small description of the following function.\n\nPlease do it in the following format given as an example, important do not return the header of the function, do not return a explanation of the function, your output must be only the docs in the following format.\n\n## Parameters\n\n- transaction_id - foreign key of the Transactions table.\n## Description\n Performs a search in the database\n\n## Returns\n the Transaction corresponding to transaction_id\n\nFunction to document:\n)
 
   @default_module_prompt ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\n ## Main functionality\n\n The module GithubAi provides a way of communicating with Github AI API.\n\n ## Description\n\n It implements the behavior Provider a standard way to use a provider in LazyDoc.\n"""\n\nModule to document:\n)
 
@@ -168,17 +168,7 @@ defmodule Mix.Tasks.LazyDoc do
     new_ast
   end
 
-  @doc """
-
-  Parameters
-
-  entries - a list of entry structures containing functions and associated ASTs.
-  Description
-   A list of entries to process, transforming functions based on model responses.
-
-  Returns
-   None
-  """
+  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/proccess_files.md")
   def proccess_files(entries) do
     {provider_mod, model, params} = Application.get_env(:lazy_doc, :provider)
 
@@ -232,28 +222,9 @@ defmodule Mix.Tasks.LazyDoc do
     end)
   end
 
-  @doc """
-
-  Parameters
-
-  _module - the module to which the nodes will be inserted.
-  module_ast - the abstract syntax tree of the module.
-  functions - a list of functions to be processed.
-  final_prompt - a string prompt to be appended to each function's prompt.
-  provider_mod - the module responsible for making requests to the provider.
-  model_text - the text representation of the model used in the request.
-  token - the authentication token for the provider.
-  acc - the accumulator for building the updated abstract syntax tree.
-
-  Description
-   Inserts nodes into a module based on provided functions and prompts.
-
-  Returns
-   the updated abstract syntax tree after processing the functions.
-
-  """
+  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/insert_nodes_in_module.md")
   def insert_nodes_in_module(
-        {_module, module_ast, functions},
+        {module, module_ast, functions},
         final_prompt,
         provider_mod,
         model_text,
@@ -261,6 +232,8 @@ defmodule Mix.Tasks.LazyDoc do
         params,
         acc
       ) do
+    is_external_docs = Application.get_env(:lazy_doc, :external_docs, false)
+
     Enum.reduce(functions, acc, fn {:function, {function_atom, function_stringified}}, acc_ast ->
       function_prompt = final_prompt <> function_stringified
 
@@ -270,14 +243,37 @@ defmodule Mix.Tasks.LazyDoc do
 
       docs = Provider.get_docs_from_response(provider_mod, response)
 
-      ok? = docs_are_ok?(docs)
-
-      docs_to_node(ok?, docs, acc_ast, function_atom, module_ast)
+      docs = fix_docs_format(is_external_docs, module, docs, function_atom)
+      docs_to_node(docs, acc_ast, function_atom, module_ast)
     end)
   end
 
+  defp fix_docs_format(is_external_docs, module, docs, function_atom) do
+    if is_external_docs do
+      path =
+        to_string(module.module_info(:compile)[:source])
+        |> String.split("/lib")
+        |> Enum.at(1)
+        |> then(fn path -> "lazy_doc#{path}" end)
+        |> String.replace(
+          ".ex",
+          ""
+        )
+
+      File.mkdir_p(path)
+
+      file = "#{path}/#{function_atom}.md"
+
+      File.write!(file, docs)
+
+      "@doc File.read!(\"#{file}\")"
+    else
+      ~s(@doc """\n\n#{docs}\n\n""")
+    end
+  end
+
   @doc false
-  def docs_to_node(true, docs, acc_ast, function_atom, module_ast) do
+  def docs_to_node(docs, acc_ast, function_atom, module_ast) do
     result =
       Code.string_to_quoted_with_comments(docs,
         literal_encoder: &{:ok, {:__block__, &2, [&1]}},
@@ -295,27 +291,7 @@ defmodule Mix.Tasks.LazyDoc do
     end
   end
 
-  @doc false
-  def docs_to_node(false, docs, _ast, _function_atom) do
-    Logger.error(
-      "docs are in a wrong format review your prompt\n\n this was returned by the AI: #{docs}"
-    )
-  end
-
-  @doc """
-
-  ## Parameters
-
-  - docs - the documentation string to be converted to an abstract syntax tree (AST).
-  - acc_ast - the accumulator AST to which the new documentation will be added.
-  - module_ast - the AST of the module where the documentation will be inserted.
-
-  ## Description
-   Converts a documentation string into an Elixir AST and inserts it into the specified module's AST.
-
-  ## Returns
-   the updated accumulator AST after inserting the new documentation.
-  """
+  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/docs_to_module_doc_node.md")
   def docs_to_module_doc_node(docs, acc_ast, module_ast) do
     result =
       Code.string_to_quoted_with_comments(docs,
