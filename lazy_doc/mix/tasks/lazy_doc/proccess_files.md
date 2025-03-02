@@ -1,9 +1,9 @@
 ## Parameters
 
-- entries - a list of entry structures containing modules, functions, and associated AST.
+- entries - a list of entries containing module and function information for processing.
 
 ## Description
-Processes a list of entries, generating documentation for modules and functions by querying a provider.
+Processes a list of entries to generate documentation based on the specified provider configuration.
 
 ## Returns
-Nothing; it writes formatted documentation to files based on the provided entries.
+None, the function writes processed documentation to files.

@@ -6,21 +6,11 @@ defmodule LazyDoc.Example do
   the task provided.
   """
 
+  @doc File.read!("lazy_doc/lazy_doc/example/my_func_2.md")
+
   ## This comment is just to ilustrate that the algorithm will
   ## take the comments
 
-  @doc """
-
-  Parameters
-
-  n - an integer input to the function.
-  Description
-   Returns a string representation of the input number.
-
-  Returns
-   a string that indicates the value of n
-
-  """
   def my_func_2(1) do
     "is one"
   end
@@ -33,45 +23,15 @@ defmodule LazyDoc.Example do
     "is #{inspect(n)}"
   end
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> LazyDoc.hello()
-      :world
-
-  """
+  @doc File.read!("lazy_doc/lazy_doc/example/hello.md")
   def hello do
     :world
   end
 
-  @doc """
-
-  Parameters
-
-  None
-  Description
-   Outputs "Hello world" to the console.
-
-  Returns
-   None
-
-  """
+  @doc File.read!("lazy_doc/lazy_doc/example/func_without_doc.md")
   def func_without_doc(), do: IO.puts("Hello world")
 
-  @doc """
-
-  Parameters
-
-  n - an integer that can take different values.
-  Description
-   Returns a string representing the number.
-
-  Returns
-   a string indicating the value of n, with specific responses for 1 and 2.
-
-  """
+  @doc File.read!("lazy_doc/lazy_doc/example/my_func.md")
   def my_func(1) do
     "is one"
   end

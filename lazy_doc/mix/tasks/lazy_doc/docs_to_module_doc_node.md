@@ -1,11 +1,11 @@
 ## Parameters
 
-- docs - the documentation string to be processed.
-- acc_ast - the accumulated abstract syntax tree (AST) to which the new documentation will be added.
-- module_ast - the abstract syntax tree (AST) of the module that contains the documentation.
+- docs - the documentation string that needs to be converted into an Abstract Syntax Tree (AST).
+- acc_ast - the accumulator Abstract Syntax Tree that will be updated.
+- module_ast - the module's AST where the documentation will be inserted.
 
 ## Description
- Processes the documentation string and integrates it into the module's AST.
+Converts a documentation string into an Elixir AST and inserts it into the specified module AST.
 
 ## Returns
- The updated accumulated abstract syntax tree (AST) after inserting the documentation node.
+The updated accumulator Abstract Syntax Tree after the documentation has been inserted.

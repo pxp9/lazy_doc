@@ -18,18 +18,7 @@ defmodule Mix.Tasks.LazyDoc do
 
   @default_module_prompt ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\n ## Main functionality\n\n The module GithubAi provides a way of communicating with Github AI API.\n\n ## Description\n\n It implements the behavior Provider a standard way to use a provider in LazyDoc.\n"""\n\nModule to document:\n)
 
-  @doc """
-
-  Parameters
-
-  _command_line_args - command line arguments provided to the function.
-  Description
-   Runs the main application logic for the LazyDoc utility, processing source files to extract documentation.
-
-  Returns
-   None
-
-  """
+  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/run.md")
   def run(_command_line_args) do
     ## Start req
 
@@ -46,45 +35,17 @@ defmodule Mix.Tasks.LazyDoc do
     |> proccess_files()
   end
 
-  @doc """
-
-  Parameters
-
-  docs - a string representing the documentation to be validated.
-  Description
-   Checks if the provided documentation format is correct.
-
-  Returns
-   true if the documentation is formatted correctly, false otherwise.
-
-  """
+  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/docs_are_ok?.md")
   def docs_are_ok?(docs) when is_binary(docs) do
     match?("@doc \" " <> _, docs) or match?("@doc \"\"\"\n" <> _, docs)
   end
 
-  @doc """
-  write to given file the given Elixir AST
-  This function does not write it in the proper format and it will remove comments as well
-  """
+  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/write_to_file.md")
   def write_to_file(file, ast) do
     File.write(file, Macro.to_string(ast))
   end
 
-  @doc """
-
-  ## Parameters
-
-  - file - the name of the file where the formatted content will be written.
-  - ast - the abstract syntax tree representation of the code to be written.
-  - comments - optional comments to include with the formatted output.
-
-  ## Description
-   Formats the given abstract syntax tree (AST) and writes it to the specified file, including any provided comments.
-
-  ## Returns
-   :ok if the write operation is successful, or {:error, reason} if it fails.
-
-  """
+  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/write_to_file_formatted.md")
   def write_to_file_formatted(file, ast, comments) do
     line_length = Application.get_env(:lazy_doc, :line_length, 98)
 
@@ -98,9 +59,7 @@ defmodule Mix.Tasks.LazyDoc do
     File.write(file, to_write)
   end
 
-  @doc """
-   This should work for most of the modules, it will not work if the module contains only one function because Elixir does not create a `__block__` node in this case.
-  """
+  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/insert_doc_for_function.md")
   def insert_doc_for_function(ast, name_func, ast_doc, module_ast) do
     {new_ast, _acc} =
       Macro.traverse(
@@ -310,21 +269,7 @@ defmodule Mix.Tasks.LazyDoc do
     end
   end
 
-  @doc """
-
-  ## Parameters
-
-  - ast - the Abstract Syntax Tree (AST) representing the module structure.
-  - module_ast - the AST representation of the specific module to be modified.
-  - ast_doc - a documentation string or AST node to be inserted into the module.
-
-  ## Description
-  Inserts documentation into a specified module in the AST by traversing and modifying the module's structure.
-
-  ## Returns
-  The modified AST with the new documentation inserted.
-
-  """
+  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/insert_module_doc.md")
   def insert_module_doc(ast, module_ast, ast_doc) do
     {new_ast, _acc} =
       Macro.prewalk(
