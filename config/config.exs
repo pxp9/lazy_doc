@@ -9,6 +9,7 @@ _ = """
 """
 
 config :lazy_doc,
+  external_docs: false,
   patterns: [
     ~r"^lib/[a-zA-Z_]+(?:/[a-zA-Z_]+)*/[a-zA-Z_]+\.ex$"
   ],

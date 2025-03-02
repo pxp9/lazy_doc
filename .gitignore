@@ -46,3 +46,5 @@ npm-debug.log
 
 # Cldr
 /priv/cldr/*
+
+.vscode

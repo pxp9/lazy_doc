@@ -317,6 +317,15 @@ defmodule Mix.Tasks.LazyDoc do
    the updated accumulator AST after inserting the new documentation.
   """
   def docs_to_module_doc_node(docs, acc_ast, module_ast) do
+    docs_to_module_doc_node(
+      Application.get_env(:lazy_doc, :custom_module_prompt, false),
+      docs,
+      acc_ast,
+      module_ast
+    )
+  end
+
+  defp docs_to_module_doc_node(true, docs, acc_ast, module_ast) do
     result =
       Code.string_to_quoted_with_comments(docs,
         literal_encoder: &{:ok, {:__block__, &2, [&1]}},
@@ -332,6 +341,9 @@ defmodule Mix.Tasks.LazyDoc do
         Logger.error("Cannot parse the response as an Elixir AST: #{inspect(reason)}")
         acc_ast
     end
+  end
+
+  defp docs_to_module_doc_node(false, docs, acc_ast, module_ast) do
   end
 
   @doc """
