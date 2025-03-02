@@ -1,4 +1,5 @@
 defmodule LazyDoc do
+  @global_path "lib/**/*.ex"
   @moduledoc """
 
    ## Main functionality
@@ -22,7 +23,6 @@ defmodule LazyDoc do
    a list of maps containing details about each file, including the content, AST, modules, functions, and comments extracted.
 
   """
-  @global_path "lib/**/*.ex"
   def extract_data_from_files() do
     patterns =
       Application.get_env(:lazy_doc, :patterns, [
