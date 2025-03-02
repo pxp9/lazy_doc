@@ -22,13 +22,16 @@ defmodule Mix.Tasks.LazyDoc.Clean do
     |> Enum.each(fn entry ->
       ast =
         Enum.reduce(entry.functions_documented, entry.ast, fn {_mod, mod_ast, functions}, acc ->
-          Enum.reduce(functions, acc, fn {:function, {function_atom, _function_stringified}},
-                                         acc_ast ->
-            delete_doc_from_ast(acc_ast, mod_ast, function_atom)
-          end)
+          delete_function_docs_from_ast(acc, functions)
         end)
 
       Mix.Tasks.LazyDoc.write_to_file_formatted(entry.file, ast, entry.comments)
+    end)
+  end
+
+  defp delete_function_docs_from_ast(acc, functions) do
+    Enum.reduce(functions, acc, fn {:function, {function_atom, _function_stringified}}, acc_ast ->
+      delete_doc_from_ast(acc_ast, mod_ast, function_atom)
     end)
   end
 
