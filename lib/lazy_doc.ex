@@ -14,7 +14,7 @@ defmodule LazyDoc do
 
   Parameters
 
-  path_wildcard - a string pattern used to match file paths for reading.
+  patterns - a string pattern used to match file paths for reading.
   Description
    Reads files that match the given wildcard pattern, extracts their abstract syntax tree (AST), comments, and function definitions.
 
@@ -22,10 +22,19 @@ defmodule LazyDoc do
    a list of maps containing details about each file, including the content, AST, modules, functions, and comments extracted.
 
   """
+  @global_path "lib/**/*.ex"
   def extract_data_from_files() do
-    path_wildcard = Application.get_env(:lazy_doc, :path_wildcard, "lib/**/*.ex")
+    patterns =
+      Application.get_env(:lazy_doc, :patterns, [
+        ~r"^lib/[a-zA-Z_]+(?:/[a-zA-Z_]+)*/[a-zA-Z_]+\.ex$"
+      ])
 
-    Path.wildcard(path_wildcard)
+    Path.wildcard(@global_path)
+    |> Enum.filter(fn path ->
+      Enum.any?(patterns, fn regex ->
+        Regex.match?(regex, path)
+      end)
+    end)
     |> Enum.map(fn file ->
       # this task is for dev purposes so if we do not have a success read, it is weird.
       {:ok, content} = File.read(file)
@@ -372,7 +381,7 @@ defmodule LazyDoc do
 
   Returns
    a map where the keys are function names and the values are lists of their corresponding documentation strings.
-    
+
   """
   def group_docs_different_arities(func_docs) do
     Enum.group_by(
