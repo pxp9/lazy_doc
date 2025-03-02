@@ -299,6 +299,19 @@ defmodule LazyDoc do
     {module, module_ast, functions}
   end
 
+  def filter_documented_functions(
+        {module, module_ast, _code_mod, functions},
+        {_mod, {_module_doc, function_docs}}
+      ) do
+    functions =
+      Enum.filter(functions, fn {type, {func_name, _code}} ->
+        type == :function and
+          not Enum.all?(function_docs[func_name], fn elem -> elem in [:none, :hidden] end)
+      end)
+
+    {module, module_ast, functions}
+  end
+
   @doc """
 
   ## Parameters
