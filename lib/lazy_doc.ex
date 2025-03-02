@@ -73,15 +73,21 @@ defmodule LazyDoc do
           filter_undocumented_functions(names_module, function_docs_single_module)
         end)
 
+      functions_documented =
+        Enum.map(zip_to_process, fn {names_module, function_docs_single_module} ->
+          filter_documented_functions(names_module, function_docs_single_module)
+        end)
+
       modules =
         filter_undocumented_modules(zip_to_process)
 
       %{
         file: file,
         content: content,
-        lines: String.split(content, "\n") |> Stream.map(&String.trim/1) |> Enum.with_index(),
         ast: ast,
         functions: functions,
+        ## Used only for deleting the docs
+        functions_documented: functions_documented,
         modules: modules,
         comments: comments
       }
@@ -306,7 +312,7 @@ defmodule LazyDoc do
     functions =
       Enum.filter(functions, fn {type, {func_name, _code}} ->
         type == :function and
-          not Enum.all?(function_docs[func_name], fn elem -> elem in [:none, :hidden] end)
+          Enum.any?(function_docs[func_name], fn elem -> elem not in [:none, :hidden] end)
       end)
 
     {module, module_ast, functions}
