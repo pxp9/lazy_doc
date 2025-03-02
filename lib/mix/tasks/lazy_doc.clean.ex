@@ -35,7 +35,6 @@ defmodule Mix.Tasks.LazyDoc.Clean do
     end)
   end
 
-
   ## It will work if we suppose @doc is on top of the function.
   @doc File.read!("lazy_doc/mix/tasks/lazy_doc.clean/delete_doc_from_ast.md")
   def delete_doc_from_ast(ast, module_ast, name_func) do
