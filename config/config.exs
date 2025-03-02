@@ -11,7 +11,7 @@ _ = """
 config :lazy_doc,
   external_docs: true,
   patterns: [
-    ~r"^lib/[a-zA-Z_]+(?:/[a-zA-Z_]+)*/[a-zA-Z_]+\.ex$"
+    ~r"^lib(?:/[a-zA-Z_]+)*/[a-zA-Z_]+\.ex$"
   ],
   max_retries: 3,
   receive_timeout: 15_000,

@@ -253,32 +253,33 @@ defmodule Mix.Tasks.LazyDoc do
 
       docs = Provider.get_docs_from_response(provider_mod, response)
 
-      docs =
-        if is_external_docs do
-          path =
-            to_string(module.module_info(:compile)[:source])
-            |> String.split("/lib")
-            |> Enum.at(1)
-            |> then(fn path -> "lazy_doc#{path}" end)
-            |> String.replace(
-              ".ex",
-              ""
-            )
-
-          File.mkdir_p(path)
-
-          file = "#{path}/#{function_atom}.md"
-
-          File.write!(file, docs)
-
-          "@doc File.read!(\"#{file}\")"
-        else
-          ~s(@doc """\n\n#{docs}\n\n""")
-        end
-        |> dbg()
-
+      docs = fix_docs_format(is_external_docs, module, docs, function_atom)
       docs_to_node(docs, acc_ast, function_atom, module_ast)
     end)
+  end
+
+  defp fix_docs_format(is_external_docs, module, docs, function_atom) do
+    if is_external_docs do
+      path =
+        to_string(module.module_info(:compile)[:source])
+        |> String.split("/lib")
+        |> Enum.at(1)
+        |> then(fn path -> "lazy_doc#{path}" end)
+        |> String.replace(
+          ".ex",
+          ""
+        )
+
+      File.mkdir_p(path)
+
+      file = "#{path}/#{function_atom}.md"
+
+      File.write!(file, docs)
+
+      "@doc File.read!(\"#{file}\")"
+    else
+      ~s(@doc """\n\n#{docs}\n\n""")
+    end
   end
 
   @doc false
@@ -300,20 +301,7 @@ defmodule Mix.Tasks.LazyDoc do
     end
   end
 
-  @doc """
-
-  ## Parameters
-
-  - docs - the documentation string to be converted to an abstract syntax tree (AST).
-  - acc_ast - the accumulator AST to which the new documentation will be added.
-  - module_ast - the AST of the module where the documentation will be inserted.
-
-  ## Description
-   Converts a documentation string into an Elixir AST and inserts it into the specified module's AST.
-
-  ## Returns
-   the updated accumulator AST after inserting the new documentation.
-  """
+  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/docs_to_module_doc_node.md")
   def docs_to_module_doc_node(docs, acc_ast, module_ast) do
     result =
       Code.string_to_quoted_with_comments(docs,
