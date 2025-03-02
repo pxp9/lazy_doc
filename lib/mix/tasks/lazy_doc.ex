@@ -168,17 +168,7 @@ defmodule Mix.Tasks.LazyDoc do
     new_ast
   end
 
-  @doc """
-
-  Parameters
-
-  entries - a list of entry structures containing functions and associated ASTs.
-  Description
-   A list of entries to process, transforming functions based on model responses.
-
-  Returns
-   None
-  """
+  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/proccess_files.md")
   def proccess_files(entries) do
     {provider_mod, model, params} = Application.get_env(:lazy_doc, :provider)
 
