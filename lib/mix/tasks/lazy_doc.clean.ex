@@ -18,6 +18,12 @@ defmodule Mix.Tasks.LazyDoc.Clean do
 
     Mix.Task.run("app.config")
 
+    if not clean_tree?() do
+      IO.("Uncommitted changes detected.\nPlease stash your changes before running this task")
+
+      exit({:shutdown, 1})
+    end
+
     LazyDoc.extract_data_from_files()
     |> Enum.each(fn entry ->
       ast =
@@ -92,4 +98,15 @@ defmodule Mix.Tasks.LazyDoc.Clean do
 
     new_ast
   end
+
+  def clean_tree?() do
+    "git"
+    |> System.cmd(["diff-files", "--quiet"])
+    |> clean_tree()
+  rescue
+    ErlangError -> true
+  end
+
+  defp clean_tree({_, 0}), do: true
+  defp clean_tree({_, 1}), do: false
 end
