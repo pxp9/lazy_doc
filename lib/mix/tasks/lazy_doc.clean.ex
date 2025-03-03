@@ -98,6 +98,7 @@ defmodule Mix.Tasks.LazyDoc.Clean do
     new_ast
   end
 
+  @doc File.read!("lazy_doc/mix/tasks/lazy_doc.clean/clean_tree?.md")
   def clean_tree?() do
     "git"
     |> System.cmd(["diff-files", "--quiet"])
