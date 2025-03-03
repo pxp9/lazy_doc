@@ -19,8 +19,7 @@ defmodule Mix.Tasks.LazyDoc.Clean do
     Mix.Task.run("app.config")
 
     if not clean_tree?() do
-      IO.("Uncommitted changes detected.\nPlease stash your changes before running this task")
-
+      IO.puts("Uncommitted changes detected.\nPlease stash your changes before running this task")
       exit({:shutdown, 1})
     end
 
