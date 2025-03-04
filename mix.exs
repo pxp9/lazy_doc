@@ -53,19 +53,16 @@ defmodule LazyDoc.MixProject do
     ]
   end
 
-
-  
   defp docs do
     [
-      main: "readme", 
+      main: "readme",
       source_ref: "#{@version}",
       source_url: github_link(),
       skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
       extras: ["README.md"]
-     ]
+    ]
   end
 
-  
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
