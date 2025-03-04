@@ -1,4 +1,5 @@
 defmodule LazyDoc do
+  @global_path "lib/**/*.ex"
   @moduledoc """
 
    ## Main functionality
@@ -10,23 +11,11 @@ defmodule LazyDoc do
    It implements functions to read files matching a given path pattern, extract their AST and comments, group function definitions by names and arities, filter out undocumented functions and modules, and retrieve associated documentation for the extracted modules. The module serves as a utility for generating or managing documentation for Elixir projects.
   """
 
-  @doc """
-
-  Parameters
-
-  patterns - a string pattern used to match file paths for reading.
-  Description
-   Reads files that match the given wildcard pattern, extracts their abstract syntax tree (AST), comments, and function definitions.
-
-  Returns
-   a list of maps containing details about each file, including the content, AST, modules, functions, and comments extracted.
-
-  """
-  @global_path "lib/**/*.ex"
+  @doc File.read!("lazy_doc/lazy_doc/extract_data_from_files.md")
   def extract_data_from_files() do
     patterns =
       Application.get_env(:lazy_doc, :patterns, [
-        ~r"^lib(?:/[a-zA-Z_]+)*/[a-zA-Z_]+\.ex$"
+        ~r"^lib(?:/[a-zA-Z_\.]+)*/[a-zA-Z_\.]+\.ex$"
       ])
 
     Path.wildcard(@global_path)
@@ -73,15 +62,21 @@ defmodule LazyDoc do
           filter_undocumented_functions(names_module, function_docs_single_module)
         end)
 
+      functions_documented =
+        Enum.map(zip_to_process, fn {names_module, function_docs_single_module} ->
+          filter_documented_functions(names_module, function_docs_single_module)
+        end)
+
       modules =
         filter_undocumented_modules(zip_to_process)
 
       %{
         file: file,
         content: content,
-        lines: String.split(content, "\n") |> Stream.map(&String.trim/1) |> Enum.with_index(),
         ast: ast,
         functions: functions,
+        ## Used only for deleting the docs
+        functions_documented: functions_documented,
         modules: modules,
         comments: comments
       }
@@ -151,18 +146,8 @@ defmodule LazyDoc do
     end
   end
 
-  @doc """
+  @doc File.read!("lazy_doc/lazy_doc/extract_names.md")
 
-  Parameters
-
-  ast - an abstract syntax tree (AST) structure representing the source code.
-  Description
-   Initiates the extraction of names from the given AST.
-
-  Returns
-   a list of names extracted from the AST.
-
-  """
   # TO_DO: support defprotocol and defimpl
   def extract_names(ast) do
     extract_names(ast, [])
@@ -268,20 +253,7 @@ defmodule LazyDoc do
     acc
   end
 
-  @doc """
-
-  Parameters
-
-  list_nodes - a list containing nodes which include functions
-  list_undocumented_functions - a list of functions identified as undocumented.
-
-  Description
-   Filters a list of nodes to find those that correspond to undocumented functions.
-
-  Returns
-   a list of nodes that are undocumented functions present in list_nodes.
-
-  """
+  @doc File.read!("lazy_doc/lazy_doc/filter_undocumented_functions.md")
   def filter_undocumented_functions(
         {module, module_ast, _code_mod, functions},
         {_mod, {_module_doc, function_docs}}
@@ -299,19 +271,21 @@ defmodule LazyDoc do
     {module, module_ast, functions}
   end
 
-  @doc """
+  @doc File.read!("lazy_doc/lazy_doc/filter_documented_functions.md")
+  def filter_documented_functions(
+        {module, module_ast, _code_mod, functions},
+        {_mod, {_module_doc, function_docs}}
+      ) do
+    functions =
+      Enum.filter(functions, fn {type, {func_name, _code}} ->
+        type == :function and
+          Enum.any?(function_docs[func_name], fn elem -> elem not in [:none, :hidden] end)
+      end)
 
-  ## Parameters
+    {module, module_ast, functions}
+  end
 
-  - zip_to_process - a list of tuples containing module information and their documentation.
-
-  ## Description
-  Filters the given list of modules and returns those that do not have associated documentation.
-
-  ## Returns
-  A list of tuples containing modules and their respective AST and code without documentation.
-
-  """
+  @doc File.read!("lazy_doc/lazy_doc/filter_undocumented_modules.md")
   def filter_undocumented_modules(zip_to_process) do
     Enum.filter(zip_to_process, fn
       {_names_module, {_mod, {module_doc, _function_docs}}} ->
@@ -335,18 +309,7 @@ defmodule LazyDoc do
              signature: [binary()],
              metadata: map()
 
-  @doc """
-
-  Parameters
-
-  modules - a list of modules to fetch documentation for.
-  Description
-   Retrieves documentation for the given modules, filtering out functions with no documentation.
-
-  Returns
-   a list of tuples containing the documentation for each module including functions.
-
-  """
+  @doc File.read!("lazy_doc/lazy_doc/docs_per_module.md")
   def docs_per_module(modules) do
     Enum.map(modules, fn module ->
       {:docs_v1, _annotation, _beam_language, _format, module_doc, _metadata, function_docs} =
@@ -362,18 +325,7 @@ defmodule LazyDoc do
     end)
   end
 
-  @doc """
-
-  Parameters
-
-  func_docs - a list of function documentation tuples, where each tuple contains the function name, line number, signature, and documentation string.
-  Description
-   Groups function documentation by their names in order to organize and access documentation for functions with different arities.
-
-  Returns
-   a map where the keys are function names and the values are lists of their corresponding documentation strings.
-
-  """
+  @doc File.read!("lazy_doc/lazy_doc/group_docs_different_arities.md")
   def group_docs_different_arities(func_docs) do
     Enum.group_by(
       func_docs,

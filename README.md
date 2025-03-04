@@ -5,35 +5,6 @@ Lazy Doc is a project for those who are lazy af to document their code.
 It is designed to detect undocumented functions, pass the function to an AI
 provider which is a tuple of two elements `{GithubAi, :codestral}`.
 
-## Roadmap
-
-- [X] Make AI docs for functions `@doc`.
-- [X] Simple check if the response is in `@doc` format.
-- [X] Make AI providers more extensible (define a behavior, what an AI provider
-  should do ?).
-- [X] Custom path wildcard (limits the action of `lazy_doc`)
-- [X] Make some unit tests.
-- [X] Improve the default prompt to generate markdown syntax.
-- [X] Fix inner module detection (creates scopes for inner modules and builds
-  the full name of the inner module).
-- [X] Make a task or an arg in the current task to check if the functions are
-  documented. (allows CI usage)
-- [X] File is written to file according to Elixir formatter.
-- [X] Make AI docs for modules as well, `@moduledoc`.
-- [X] Custom prompts for function and module.
-- [ ] Simple check if the response is in `@moduledoc` format.
-- [X] Customizable number of retries.
-- [X] Custom paramters to pass the provider (max\_tokens, top\_p, temperature).
-- [X] Check if custom paramters are valid for that provider.
-- [ ] Inspect the `defimpl` and `defprotocol` nodes.
-- [ ] Make `@moduledoc` documentation take data from the Modules is related the
-  given module.
-- [ ] Spec mode: Detect if a function does not have any `@specs` and try to
-  generate their specs.
-- [ ] Make an option `external_docs` to do `@doc
-  File.read!("file_gen_by_lazy_doc.md")`, this will prevent code redability
-  issues, it will create a folder where all the docs is generated.
-
 ## Installation
 
 ``` elixir
@@ -137,3 +108,34 @@ produces the following AST
    ]
  ]}
 ```
+
+## Roadmap
+
+- [X] Make AI docs for functions `@doc`.
+- [X] Simple check if the response is in `@doc` format.
+- [X] Make AI providers more extensible (define a behavior, what an AI provider
+  should do ?).
+- [X] Custom path wildcard (limits the action of `lazy_doc`)
+- [X] Make some unit tests.
+- [X] Improve the default prompt to generate markdown syntax.
+- [X] Fix inner module detection (creates scopes for inner modules and builds
+  the full name of the inner module).
+- [X] Make a task or an arg in the current task to check if the functions are
+  documented. (allows CI usage)
+- [X] File is written to file according to Elixir formatter.
+- [X] Make AI docs for modules as well, `@moduledoc`.
+- [X] Custom prompts for function and module.
+- [ ] Simple check if the response is in `@moduledoc` format.
+- [X] Customizable number of retries.
+- [X] Custom paramters to pass the provider (max\_tokens, top\_p, temperature).
+- [X] Check if custom paramters are valid for that provider.
+- [ ] Inspect the `defimpl` and `defprotocol` nodes.
+- [ ] Make `@moduledoc` documentation take data from the Modules is related the
+  given module.
+- [ ] Spec mode: Detect if a function does not have any `@specs` and try to
+  generate their specs.
+- [X] Make an option `external_docs` to do `@doc
+  File.read!("file_gen_by_lazy_doc.md")`, this will prevent code redability
+  issues, it will create a folder where all the docs is generated.
+- [X] Make a `mix lazy_doc.clean` task that will allow to clear all the docs for
+  updating to new docs.

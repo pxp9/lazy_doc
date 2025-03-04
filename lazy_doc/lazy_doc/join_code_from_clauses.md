@@ -1,9 +1,9 @@
 ## Parameters
 
-- names - a list of tuples containing type and name/code pairs to process for join code generation.
+- names - a list of tuples where each tuple contains a type and a name with code.
 
 ## Description
-Processes the list of name/code tuples to generate a list of joined code based on the naming criteria defined within the function.
+Recursively processes a list of name-code tuples to generate a list of joined code based on matching names.
 
 ## Returns
-A list of tuples representing the joined code or original tuples where applicable.
+A list of functions or tuples based on the input names.
