@@ -1,8 +1,8 @@
-Returns a list of tuples containing each module and its corresponding documentation details.
+Returns a list of documentation for each function in the specified modules.
 
 ## Parameters
 
-- modules - a list of modules to fetch documentation for.
-
+- modules - a list of module names to extract documentation from.
+  
 ## Description
-Retrieves the documentation for the specified modules, filtering to include only the functions.
+ Retrieves the documentation for functions in the given modules using Elixir's introspection capabilities.

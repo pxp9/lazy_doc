@@ -1,11 +1,10 @@
+Returns the modified AST with the documentation for the specified module inserted.
+
 ## Parameters
 
-- ast - the abstract syntax tree to be transformed.
-- module_ast - the specific module's abstract syntax tree that is being targeted for documentation.
-- ast_doc - the documentation string to be inserted into the module.
+- ast - the abstract syntax tree representing the original code.
+- module_ast - the abstract syntax tree of the module where documentation is to be inserted.
+- ast_doc - the documentation to be inserted into the module's AST.
 
 ## Description
-Inserts documentation into the specified module's AST, either as a new block or by prepending it to an existing block.
-
-## Returns
-The modified abstract syntax tree with the documentation inserted into the desired module.
+Modifies the module's AST to include documentation by traversing the original AST.

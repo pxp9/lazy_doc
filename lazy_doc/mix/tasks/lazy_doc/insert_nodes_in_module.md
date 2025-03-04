@@ -1,17 +1,16 @@
+Returns the updated abstract syntax tree after inserting documentation nodes for specified functions in the given module.
+
 ## Parameters
 
-- module - the module in which the nodes will be inserted.
-- module_ast - the abstract syntax tree representation of the module.
-- functions - a list of function tuples containing function name atoms and their string representations.
-- final_prompt - the prompt string used for generating documentation.
-- provider_mod - the module responsible for provider-specific requests.
-- model_text - the text input to the model used for processing the prompt.
-- token - the authorization token for API requests.
-- params - additional parameters passed to the request.
-- acc - the accumulator for building the resulting abstract syntax tree.
+- module - atom representing the module name.
+- module_ast - the abstract syntax tree of the module.
+- functions - a list of functions for which documentation needs to be inserted.
+- final_prompt - the final prompt to use for generating documentation.
+- provider_mod - the module responsible for making the request to the provider.
+- model_text - the text model to be used in the request.
+- token - authentication token for the provider.
+- params - additional parameters for the request.
+- acc - an accumulator that holds the current state of the abstract syntax tree.
 
 ## Description
-Inserts documentation nodes into a module based on specified functions and prompts.
-
-## Returns
-The updated abstract syntax tree with documentation nodes inserted.
+Handles the insertion of documentation nodes by leveraging an external documentation provider and integrates the results into the module's AST.

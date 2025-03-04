@@ -1,12 +1,11 @@
+Returns a request configuration for querying a model with the specified parameters.
+
 ## Parameters
 
-- prompt - The input text that the model will respond to.
-- model - The specific model to be used for generating a response.
-- token - The authentication token required to access the model.
-- params - Additional parameters for controlling the generation, such as temperature, top_p, and max_tokens.
+- prompt - The input text that will guide the model's response.
+- model - The identifier of the model to use for generating the output.
+- token - The authentication token for accessing the model's API.
+- params - Optional parameters such as temperature, top_p, and max_tokens to fine-tune the model's output.
 
 ## Description
-Prepares a request to the specified model with the given prompt and parameters.
-
-## Returns
-A configured request object ready to be sent to the API.
+ Constructs a request to the model API with specified settings and configurations.

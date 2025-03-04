@@ -1,9 +1,7 @@
+Returns true if the provided docs are formatted correctly according to the specified criteria.
+
 ## Parameters
 
-- docs - a binary string that represents documentation text.
-
+- docs - a binary string containing the documentation text to be validated.
 ## Description
- Checks if the provided documentation string is formatted correctly with an appropriate `@doc` tag.
-
-## Returns
- true if the documentation matches the expected format, false otherwise.
+Checks if the documentation is correctly formatted with either a single line or a multi-line block.

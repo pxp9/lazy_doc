@@ -1,9 +1,7 @@
+Returns the content of the message from the response.
+
 ## Parameters
 
-- response - a `%Req.Response{}` struct containing the response data.
-  
+- response - a `%Req.Response{}` struct containing the body of the response which includes the message.
 ## Description
-Extracts the message content from the first choice in the response body.
-
-## Returns
-The content of the message as a string.
+Extracts the message content from the response body.

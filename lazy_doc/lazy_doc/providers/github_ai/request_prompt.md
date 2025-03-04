@@ -1,12 +1,11 @@
+Returns the result of a request made with a prompt using a specified model and token.
+
 ## Parameters
 
-- prompt - the text input that guides the generated response.
-- model - the AI model used to process the prompt.
-- token - the authorization token required for making the request.
-- params - optional additional parameters for the request.
+- prompt - The input text or question to be sent in the request.
+- model - The model that will process the input prompt.
+- token - The authentication token required to access the request.
+- params - Optional parameters for customizing the request. 
 
 ## Description
- Sends a request to the AI model with the provided prompt and parameters.
-
-## Returns
- The response from the AI model based on the provided prompt and parameters.
+Performs a request to the API with the provided prompt and model.

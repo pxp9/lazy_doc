@@ -1,9 +1,8 @@
+Returns the processed files based on the provided entries.
+
 ## Parameters
 
-- entries - a list of entries containing module and function information for processing.
-
+- entries - a list of entries containing module and function information.
+  
 ## Description
-Processes a list of entries to generate documentation based on the specified provider configuration.
-
-## Returns
-None, the function writes processed documentation to files.
+Processes each entry, generating documentation and writing it to the respective files.

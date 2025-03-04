@@ -1,9 +1,7 @@
+Returns the exit status of the application based on the presence of undocumented functions or modules.
+
 ## Parameters
 
-- _command_line_args - command line arguments passed to the function.
-
+- _command_line_args - the command line arguments passed to the function.
 ## Description
- Initializes the LazyDoc application, runs a Mix task to load the application configuration, and extracts data from files to check for undocumented functions and modules.
-
-## Returns
- exits with a status code indicating the presence of undocumented code (1 for undocumented, 0 for none).
+ Initializes the application, runs the Mix task for configuration, and checks for undocumented functions and modules in extracted data.

@@ -1,10 +1,8 @@
+Returns whether the parameters are valid according to the given callback module.
+
 ## Parameters
 
-- callback_module - a module that implements a `check_parameters?` function.
-- params - the parameters to be checked for validity.
-
+- callback_module - the module that contains the check_parameters? method to validate the parameters.
+- params - the parameters to be validated against the callback module's method.
 ## Description
- Validates the given parameters using the specified callback module.
-
-## Returns
- a boolean indicating whether the parameters are valid or not.
+Invokes the check_parameters? method on the specified callback module to verify the validity of the provided parameters.

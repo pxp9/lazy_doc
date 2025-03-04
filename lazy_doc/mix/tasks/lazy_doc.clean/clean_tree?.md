@@ -1,9 +1,7 @@
+Returns a boolean indicating whether the working directory is clean.
+
 ## Parameters
 
 - None
-
 ## Description
-Checks if there are any uncommitted changes in the git working directory.
-
-## Returns
-Returns true if the working directory is clean, otherwise it returns false.
+ Executes a system command to check for differences in the working directory.

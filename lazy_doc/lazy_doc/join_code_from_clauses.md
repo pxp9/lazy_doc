@@ -1,9 +1,8 @@
+Returns a list of join codes derived from the given names.
+
 ## Parameters
 
-- names - a list of tuples where each tuple contains a type and a name with code.
+- names - a list of tuples where each tuple contains a type and a tuple of a name and a code.
 
 ## Description
-Recursively processes a list of name-code tuples to generate a list of joined code based on matching names.
-
-## Returns
-A list of functions or tuples based on the input names.
+Processes the input list to merge codes based on matching names, creating a comprehensive output.

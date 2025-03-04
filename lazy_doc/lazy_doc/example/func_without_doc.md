@@ -1,9 +1,7 @@
+Returns a message indicating a greeting.
+
 ## Parameters
 
 - None
-
 ## Description
- Outputs "Hello world" to the console.
-
-## Returns
- None
+Executes a print statement to display "Hello world".

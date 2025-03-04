@@ -1,9 +1,7 @@
+Returns the result of starting necessary applications and processing files based on the provided command line arguments.
+
 ## Parameters
 
-- _command_line_args - command line arguments passed to the function.
-
+- _command_line_args - the command line arguments provided to the application.
 ## Description
-Starts required applications and processes configuration, while extracting data from files.
-
-## Returns
-None
+ Initiates the required applications and processes the files accordingly.

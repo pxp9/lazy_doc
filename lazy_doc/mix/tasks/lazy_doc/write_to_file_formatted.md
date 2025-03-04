@@ -1,11 +1,10 @@
+Writes the formatted contents of an AST and comments to a specified file.
+
 ## Parameters
 
-- file - The path to the file where the formatted output will be written.
-- ast - The abstract syntax tree (AST) that needs to be converted to a string representation.
-- comments - Optional comments to include in the formatted output.
+- file - the name of the file where the formatted output will be written.
+- ast - the abstract syntax tree that needs to be formatted.
+- comments - any comments that should accompany the formatted AST.
 
 ## Description
-Formats the given abstract syntax tree and writes it to the specified file.
-
-## Returns
-The result of the file write operation, indicating success or failure.
+Formats the AST and comments as a string and writes it to the specified file.

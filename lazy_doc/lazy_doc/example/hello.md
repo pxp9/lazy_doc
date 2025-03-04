@@ -1,9 +1,7 @@
+Returns the atom :world.
+
 ## Parameters
 
 - None
-
 ## Description
- Returns the atom :world
-
-## Returns
- The atom :world
+Returns a predefined atom value.

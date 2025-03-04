@@ -1,9 +1,7 @@
+Returns the result of executing the _command_line_args through the LazyDoc application.
+
 ## Parameters
 
-- _command_line_args - a list of command-line arguments passed to the function.
-
+- _command_line_args - command line arguments to be processed by the function.
 ## Description
- Initializes the LazyDoc application, runs the Mix task for app configuration, extracts data from files, and removes documentation from the AST based on the functions documented.
-
-## Returns
- nil
+Handles the execution logic for documenting files and managing application configurations.

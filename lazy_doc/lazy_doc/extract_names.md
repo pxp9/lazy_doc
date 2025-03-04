@@ -1,10 +1,8 @@
+Returns a list of names extracted from the given AST (Abstract Syntax Tree).
+
 ## Parameters
 
-- ast - The abstract syntax tree (AST) from which names will be extracted.
-- acc - An accumulator that stores the collected names.
+- ast - the AST to be traversed for extracting names.
 
 ## Description
-Extracts module, function, and protocol names from the given abstract syntax tree.
-
-## Returns
-A list of tuples containing the extracted names and their corresponding structures.
+Traverses the AST and accumulates names of modules, protocols, and functions, returning them in a structured format.

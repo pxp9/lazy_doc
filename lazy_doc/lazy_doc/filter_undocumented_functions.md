@@ -1,12 +1,11 @@
+Returns a tuple containing the module, module AST, and a list of undocumented functions filtered from the input.
+
 ## Parameters
 
-- module - The name of the module being analyzed.
-- module_ast - The abstract syntax tree (AST) representation of the module.
-- _code_mod - The code representation of the module, not used in the function.
-- functions - A list of functions in the module.
+- module - the module name for which undocumented functions are being filtered.
+- module_ast - the abstract syntax tree representation of the module.
+- _code_mod - unused code modification parameter.
+- functions - a list of functions in the module, where each function is represented as a tuple with its type and name.
 
 ## Description
-Filters the list of functions in a module to identify those that are undocumented.
-
-## Returns
-A tuple containing the module name, its AST, and the filtered list of undocumented functions.
+Filters the provided list of functions to retain only those that are undocumented.

@@ -1,11 +1,10 @@
+Returns the updated AST after removing the specified function definition from the given module.
+
 ## Parameters
 
-- ast - the abstract syntax tree representing the module's source code.
-- module_ast - the name of the module where the function is defined.
-- name_func - the name of the function to be deleted from the module.
+- ast - the original abstract syntax tree (AST) of the module.
+- module_ast - the AST representation of the target module.
+- name_func - the name of the function to be deleted from the AST.
 
 ## Description
-Traverses the given abstract syntax tree to remove the specified function from the module's definitions.
-
-## Returns
-The new abstract syntax tree with the specified function removed.
+Traverses the AST to locate and remove a specified function definition from a given module's AST.

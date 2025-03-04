@@ -1,10 +1,9 @@
+Returns an atom indicating the status of the start operation.
+
 ## Parameters
 
-- _start_type - the type of start operation to initiate.
-- _start_args - additional arguments needed for the start operation.
+- _start_type - a variable representing the type of the start operation.
+- _start_args - a variable containing additional arguments for the start operation.
 
 ## Description
- Initializes the start operation and returns the process identifier.
-
-## Returns
- a tuple indicating success and the process identifier.
+Initiates the start process and returns the PID of the current process.

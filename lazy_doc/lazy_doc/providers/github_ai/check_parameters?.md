@@ -1,9 +1,7 @@
+Returns a boolean indicating whether all provided parameters are valid.
+
 ## Parameters
 
-- params - a keyword list containing parameters to check for validity.
-
+- params - a list of key-value pairs representing parameters to be checked.
 ## Description
-Verifies whether all provided parameters are among the allowed list of parameters.
-
-## Returns
-true if all parameters are valid, false otherwise.
+ Validates the parameters against a predefined list of acceptable keys.

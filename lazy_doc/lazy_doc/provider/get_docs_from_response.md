@@ -1,10 +1,9 @@
+Returns the documents extracted from the response using the specified callback module.
+
 ## Parameters
 
-- callback_module - a module that contains the method to retrieve documents from a response.
-- response - the data response from which to extract documents.
+- callback_module - the module responsible for handling the response and extracting the documents.
+- response - the data response from which documents need to be extracted.
 
 ## Description
-Calls the get_docs_from_response method from the specified callback module with the provided response.
-
-## Returns
-The documents extracted from the response by the callback module.
+ Calls the method get_docs_from_response in the provided callback module to process the response.

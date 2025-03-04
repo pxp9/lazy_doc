@@ -1,9 +1,7 @@
+Returns a list of undocumented modules from the provided input.
+
 ## Parameters
 
-- zip_to_process - a list of tuples containing module information, where each tuple consists of the module name, its abstract syntax tree (AST), code, and function documentation.
-
+- zip_to_process - a collection of modules and their associated documentation status.
 ## Description
-Filters out modules that do not contain any documentation.
-
-## Returns
-A list of modules, each represented as a tuple containing the module name, AST, and code.
+Filters through the provided modules to identify those without documentation and returns their details.

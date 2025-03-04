@@ -1,10 +1,8 @@
+Returns true if undocumented modules are found; otherwise, it returns false.
+
 ## Parameters
 
-- modules - a list of tuples containing module names and their associated metadata.
-- file - a string representing the file name where undocumented modules are found.
-
+- modules - a list of modules to check for documentation.
+- file - the name of the file being analyzed for undocumented modules.
 ## Description
-Logs a warning for each undocumented module and the corresponding file.
-
-## Returns
-true if there are undocumented modules, otherwise false.
+ Logs warnings for each undocumented module along with the associated file name.

@@ -1,10 +1,8 @@
+Returns the result of invoking the model method on the specified callback module with the given model.
+
 ## Parameters
 
-- callback_module - The module that contains the callback functions.
-- model - The specific model to be processed by the callback module.
-
+- callback_module - the module that contains the model method.
+- model - the data structure or object to be processed by the model method.
 ## Description
- Executes the model function of the provided callback module.
-
-## Returns
- The result from invoking the model function in the callback module with the specified model.
+ Invokes the model method from the provided callback module with the specified model argument.

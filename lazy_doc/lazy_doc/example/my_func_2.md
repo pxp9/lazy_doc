@@ -1,9 +1,8 @@
+Returns the string representation of the input number.
+
 ## Parameters
 
-- n - an integer input that determines the output string.
+- n - an integer value.
 
 ## Description
- Generates a string representation based on the provided integer.
-
-## Returns
- A string indicating the corresponding description of the input integer.
+ Returns a string indicating the value of n.

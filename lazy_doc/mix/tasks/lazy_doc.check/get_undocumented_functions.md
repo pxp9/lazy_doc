@@ -1,10 +1,9 @@
+Returns a list of modules that contain undocumented functions.
+
 ## Parameters
 
-- entry_functions - a list of functions categorized by module.
-- file - the file in which the modules and functions are defined.
+- entry_functions - a list of tuples containing module information and their respective function ASTs.
+- file - the file name where the functions are being analyzed.
 
 ## Description
- Iterates through the provided list of entry functions, checks for undocumented functions, and prints warnings if any are found.
-
-## Returns
- a list of modules containing undocumented functions.
+ Iterates over the entry functions and prints warnings for undocumented functions.
