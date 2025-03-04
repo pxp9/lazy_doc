@@ -1,10 +1,12 @@
 defmodule LazyDoc.MixProject do
   use Mix.Project
 
+  @version "0.5.1"
+
   def project do
     [
       app: :lazy_doc,
-      version: "0.5.0",
+      version: @version,
       elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -12,6 +14,7 @@ defmodule LazyDoc.MixProject do
       description: "A Mix task for documenting your projects with AI",
       package: package(),
       aliases: aliases(),
+      docs: &docs/0,
       name: "LazyDoc",
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
@@ -50,6 +53,19 @@ defmodule LazyDoc.MixProject do
     ]
   end
 
+
+  
+  defp docs do
+    [
+      main: "readme", 
+      source_ref: "#{@version}",
+      source_url: github_link(),
+      skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
+      extras: ["README.md"]
+     ]
+  end
+
+  
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
@@ -61,7 +77,7 @@ defmodule LazyDoc.MixProject do
       {:jason, "~> 1.0"},
       ## Testing and converalls
       {:plug, "~> 1.0", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.29", only: :dev, runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.18", only: :test}

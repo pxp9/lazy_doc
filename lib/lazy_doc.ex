@@ -2,13 +2,13 @@ defmodule LazyDoc do
   @global_path "lib/**/*.ex"
   @moduledoc """
 
-   ## Main functionality
+  ## Main functionality
 
-   The module LazyDoc provides a way to extract and organize documentation from Elixir source files by reading them, parsing their abstract syntax tree (AST), and collecting relevant information about modules, functions, and comments.
+  The module LazyDoc provides a way to extract and organize documentation from Elixir source files by reading them, parsing their abstract syntax tree (AST), and collecting relevant information about modules, functions, and comments.
 
-   ## Description
+  ## Description
 
-   It implements functions to read files matching a given path pattern, extract their AST and comments, group function definitions by names and arities, filter out undocumented functions and modules, and retrieve associated documentation for the extracted modules. The module serves as a utility for generating or managing documentation for Elixir projects.
+  It implements functions to read files matching a given path pattern, extract their AST and comments, group function definitions by names and arities, filter out undocumented functions and modules, and retrieve associated documentation for the extracted modules. The module serves as a utility for generating or managing documentation for Elixir projects.
   """
 
   @doc File.read!("lazy_doc/lazy_doc/extract_data_from_files.md")

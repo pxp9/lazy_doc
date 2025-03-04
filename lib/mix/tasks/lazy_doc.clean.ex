@@ -1,13 +1,13 @@
 defmodule Mix.Tasks.LazyDoc.Clean do
   @moduledoc """
 
-   ## Main functionality
+  ## Main functionality
 
-   The module Mix.Tasks.LazyDoc.Clean provides a task for cleaning up documentation in the codebase.
+  The module Mix.Tasks.LazyDoc.Clean provides a task for cleaning up documentation in the codebase.
 
-   ## Description
+  ## Description
 
-   It implements functionality for removing documentation for specific functions from the abstract syntax tree (AST) of Elixir modules. The task starts the LazyDoc application, checks the application configuration, extracts documentation data from files, and processes each entry to remove the documentation for specified functions, updating the files accordingly.
+  It implements functionality for removing documentation for specific functions from the abstract syntax tree (AST) of Elixir modules. The task starts the LazyDoc application, checks the application configuration, extracts documentation data from files, and processes each entry to remove the documentation for specified functions, updating the files accordingly.
   """
   require Logger
   use Mix.Task

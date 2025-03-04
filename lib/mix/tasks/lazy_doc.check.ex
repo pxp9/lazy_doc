@@ -1,13 +1,13 @@
 defmodule Mix.Tasks.LazyDoc.Check do
   @moduledoc """
 
-   ## Main functionality
+  ## Main functionality
 
-   The module Mix.Tasks.LazyDoc.Check is designed to facilitate the checking of documentation for functions and modules within a codebase using the LazyDoc application.
+  The module Mix.Tasks.LazyDoc.Check is designed to facilitate the checking of documentation for functions and modules within a codebase using the LazyDoc application.
 
-   ## Description
+  ## Description
 
-   It initializes the LazyDoc application, identifies undocumented functions and modules across specified files, and exits with an appropriate status code based on the presence of undocumented elements. Warnings are logged for any undocumented functions and modules encountered during the check.
+  It initializes the LazyDoc application, identifies undocumented functions and modules across specified files, and exits with an appropriate status code based on the presence of undocumented elements. Warnings are logged for any undocumented functions and modules encountered during the check.
   """
   require Logger
   use Mix.Task
