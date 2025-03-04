@@ -11,7 +11,7 @@ defmodule LazyDoc.Application do
   """
   use Application
 
-  @doc File.read!("lazy_doc/lazy_doc/application/start.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/application/start.md")
   def start(_start_type, _start_args) do
     {:ok, self()}
   end

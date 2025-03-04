@@ -12,7 +12,7 @@ defmodule Mix.Tasks.LazyDoc.Clean do
   require Logger
   use Mix.Task
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc.clean/run.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.clean/run.md")
   def run(_command_line_args) do
     _result = LazyDoc.Application.start("", "")
 
@@ -41,7 +41,7 @@ defmodule Mix.Tasks.LazyDoc.Clean do
   end
 
   ## It will work if we suppose @doc is on top of the function.
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc.clean/delete_doc_from_ast.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.clean/delete_doc_from_ast.md")
   def delete_doc_from_ast(ast, module_ast, name_func) do
     {new_ast, _acc} =
       Macro.traverse(
@@ -98,7 +98,7 @@ defmodule Mix.Tasks.LazyDoc.Clean do
     new_ast
   end
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc.clean/clean_tree?.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.clean/clean_tree?.md")
   def clean_tree?() do
     "git"
     |> System.cmd(["diff-files", "--quiet"])

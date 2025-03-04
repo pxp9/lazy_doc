@@ -6,7 +6,7 @@ defmodule LazyDoc.Example do
   the task provided.
   """
 
-  @doc File.read!("lazy_doc/lazy_doc/example/my_func_2.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/example/my_func_2.md")
 
   ## This comment is just to ilustrate that the algorithm will
   ## take the comments
@@ -23,15 +23,15 @@ defmodule LazyDoc.Example do
     "is #{inspect(n)}"
   end
 
-  @doc File.read!("lazy_doc/lazy_doc/example/hello.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/example/hello.md")
   def hello do
     :world
   end
 
-  @doc File.read!("lazy_doc/lazy_doc/example/func_without_doc.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/example/func_without_doc.md")
   def func_without_doc(), do: IO.puts("Hello world")
 
-  @doc File.read!("lazy_doc/lazy_doc/example/my_func.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/example/my_func.md")
   def my_func(1) do
     "is one"
   end

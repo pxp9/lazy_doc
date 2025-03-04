@@ -12,7 +12,7 @@ defmodule Mix.Tasks.LazyDoc.Check do
   require Logger
   use Mix.Task
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc.check/run.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.check/run.md")
   def run(_command_line_args) do
     _result = LazyDoc.Application.start("", "")
 
@@ -32,7 +32,7 @@ defmodule Mix.Tasks.LazyDoc.Check do
     end
   end
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc.check/get_undocumented_functions.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.check/get_undocumented_functions.md")
   def get_undocumented_functions(entry_functions, file) do
     Enum.reduce(entry_functions, [], fn {mod, _mod_ast, functions} = mod_tuple, acc ->
       if functions != [] do
@@ -44,7 +44,7 @@ defmodule Mix.Tasks.LazyDoc.Check do
     end)
   end
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc.check/print_warnings.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.check/print_warnings.md")
   def print_warnings(functions, mod, file) do
     Enum.each(functions, fn {:function, {name, _code}} ->
       Logger.warning("Function :#{name} in module `#{mod}` needs to be documented")
@@ -53,7 +53,7 @@ defmodule Mix.Tasks.LazyDoc.Check do
     Logger.info("file: #{file}")
   end
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc.check/get_undocumented_modules.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.check/get_undocumented_modules.md")
   def get_undocumented_modules(modules, file) do
     if modules != [] do
       Enum.each(modules, fn {mod, _mod_ast, _cod} ->

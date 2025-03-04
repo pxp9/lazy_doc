@@ -11,7 +11,7 @@ defmodule LazyDoc do
   It implements functions to read files matching a given path pattern, extract their AST and comments, group function definitions by names and arities, filter out undocumented functions and modules, and retrieve associated documentation for the extracted modules. The module serves as a utility for generating or managing documentation for Elixir projects.
   """
 
-  @doc File.read!("lazy_doc/lazy_doc/extract_data_from_files.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/extract_data_from_files.md")
   def extract_data_from_files() do
     patterns =
       Application.get_env(:lazy_doc, :patterns, [
@@ -83,7 +83,7 @@ defmodule LazyDoc do
     end)
   end
 
-  @doc File.read!("lazy_doc/lazy_doc/join_code_from_clauses.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/join_code_from_clauses.md")
   def join_code_from_clauses(names) do
     join_code_from_clauses(names, [])
   end
@@ -146,7 +146,7 @@ defmodule LazyDoc do
     end
   end
 
-  @doc File.read!("lazy_doc/lazy_doc/extract_names.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/extract_names.md")
 
   # TO_DO: support defprotocol and defimpl
   def extract_names(ast) do
@@ -253,7 +253,7 @@ defmodule LazyDoc do
     acc
   end
 
-  @doc File.read!("lazy_doc/lazy_doc/filter_undocumented_functions.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/filter_undocumented_functions.md")
   def filter_undocumented_functions(
         {module, module_ast, _code_mod, functions},
         {_mod, {_module_doc, function_docs}}
@@ -271,7 +271,7 @@ defmodule LazyDoc do
     {module, module_ast, functions}
   end
 
-  @doc File.read!("lazy_doc/lazy_doc/filter_documented_functions.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/filter_documented_functions.md")
   def filter_documented_functions(
         {module, module_ast, _code_mod, functions},
         {_mod, {_module_doc, function_docs}}
@@ -285,7 +285,7 @@ defmodule LazyDoc do
     {module, module_ast, functions}
   end
 
-  @doc File.read!("lazy_doc/lazy_doc/filter_undocumented_modules.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/filter_undocumented_modules.md")
   def filter_undocumented_modules(zip_to_process) do
     Enum.filter(zip_to_process, fn
       {_names_module, {_mod, {module_doc, _function_docs}}} ->
@@ -309,7 +309,7 @@ defmodule LazyDoc do
              signature: [binary()],
              metadata: map()
 
-  @doc File.read!("lazy_doc/lazy_doc/docs_per_module.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/docs_per_module.md")
   def docs_per_module(modules) do
     Enum.map(modules, fn module ->
       {:docs_v1, _annotation, _beam_language, _format, module_doc, _metadata, function_docs} =
@@ -325,7 +325,7 @@ defmodule LazyDoc do
     end)
   end
 
-  @doc File.read!("lazy_doc/lazy_doc/group_docs_different_arities.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/group_docs_different_arities.md")
   def group_docs_different_arities(func_docs) do
     Enum.group_by(
       func_docs,

@@ -17,13 +17,13 @@ defmodule LazyDoc.Providers.GithubAi do
   ## TO_DO: implement retry with customizable number of retries if fails but with default value.
   @spec request_prompt(binary(), binary(), binary(), keyword()) ::
           {:ok, Req.Response.t()} | {:error, Exception.t()}
-  @doc File.read!("lazy_doc/lazy_doc/providers/github_ai/request_prompt.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/providers/github_ai/request_prompt.md")
   def request_prompt(prompt, model, token, params \\ []) do
     req_query(prompt, model, token, params)
     |> Req.post()
   end
 
-  @doc File.read!("lazy_doc/lazy_doc/providers/github_ai/req_query.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/providers/github_ai/req_query.md")
   def req_query(prompt, model, token, params \\ []) do
     temperature = Keyword.get(params, :temperature, 1)
     top_p = Keyword.get(params, :top_p, 1)
@@ -55,7 +55,7 @@ defmodule LazyDoc.Providers.GithubAi do
   ## TO_DO: we should review if for each model in Github you have the same response format in the body.
   ## Maybe this premise is not true and it will require changes.
   @spec get_docs_from_response(Req.Response.t()) :: binary()
-  @doc File.read!("lazy_doc/lazy_doc/providers/github_ai/get_docs_from_response.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/providers/github_ai/get_docs_from_response.md")
   def get_docs_from_response(%Req.Response{body: body} = _response) do
     ## Take always first choice
     message = Enum.at(body["choices"], 0)["message"]["content"]
@@ -63,7 +63,7 @@ defmodule LazyDoc.Providers.GithubAi do
   end
 
   @spec model(atom()) :: binary()
-  @doc File.read!("lazy_doc/lazy_doc/providers/github_ai/model.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/providers/github_ai/model.md")
   def model(model) do
     case model do
       :codestral -> "Codestral-2501"
@@ -73,7 +73,7 @@ defmodule LazyDoc.Providers.GithubAi do
   end
 
   @spec check_parameters?(params :: keyword()) :: boolean()
-  @doc File.read!("lazy_doc/lazy_doc/providers/github_ai/check_parameters?.md")
+  @doc File.read!("priv/lazy_doc/lazy_doc/providers/github_ai/check_parameters?.md")
   def check_parameters?(params) do
     valid_params = [:max_tokens, :top_p, :temperature]
     Enum.map(params, fn {key, _value} -> key in valid_params end) |> Enum.all?()

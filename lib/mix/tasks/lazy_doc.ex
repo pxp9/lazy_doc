@@ -18,7 +18,7 @@ defmodule Mix.Tasks.LazyDoc do
 
   @default_module_prompt ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\n## Main functionality\n\nThe module GithubAi provides a way of communicating with Github AI API.\n\n## Description\n\nIt implements the behavior Provider a standard way to use a provider in LazyDoc.\n"""\n\nModule to document:\n)
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/run.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/run.md")
   def run(_command_line_args) do
     ## Start req
 
@@ -35,17 +35,17 @@ defmodule Mix.Tasks.LazyDoc do
     |> proccess_files()
   end
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/docs_are_ok?.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/docs_are_ok?.md")
   def docs_are_ok?(docs) when is_binary(docs) do
     match?("@doc \" " <> _, docs) or match?("@doc \"\"\"\n" <> _, docs)
   end
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/write_to_file.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/write_to_file.md")
   def write_to_file(file, ast) do
     File.write(file, Macro.to_string(ast))
   end
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/write_to_file_formatted.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/write_to_file_formatted.md")
   def write_to_file_formatted(file, ast, comments) do
     line_length = Application.get_env(:lazy_doc, :line_length, 98)
 
@@ -59,7 +59,7 @@ defmodule Mix.Tasks.LazyDoc do
     File.write(file, to_write)
   end
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/insert_doc_for_function.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/insert_doc_for_function.md")
   def insert_doc_for_function(ast, name_func, ast_doc, module_ast) do
     {new_ast, _acc} =
       Macro.traverse(
@@ -127,7 +127,7 @@ defmodule Mix.Tasks.LazyDoc do
     new_ast
   end
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/proccess_files.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/proccess_files.md")
   def proccess_files(entries) do
     {provider_mod, model, params} = Application.get_env(:lazy_doc, :provider)
 
@@ -181,7 +181,7 @@ defmodule Mix.Tasks.LazyDoc do
     end)
   end
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/insert_nodes_in_module.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/insert_nodes_in_module.md")
   def insert_nodes_in_module(
         {module, module_ast, functions},
         final_prompt,
@@ -213,7 +213,7 @@ defmodule Mix.Tasks.LazyDoc do
         to_string(module.module_info(:compile)[:source])
         |> String.split("/lib")
         |> Enum.at(1)
-        |> then(fn path -> "lazy_doc#{path}" end)
+        |> then(fn path -> "priv/lazy_doc#{path}" end)
         |> String.replace(
           ".ex",
           ""
@@ -250,7 +250,7 @@ defmodule Mix.Tasks.LazyDoc do
     end
   end
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/docs_to_module_doc_node.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/docs_to_module_doc_node.md")
   def docs_to_module_doc_node(docs, acc_ast, module_ast) do
     result =
       Code.string_to_quoted_with_comments(docs,
@@ -269,7 +269,7 @@ defmodule Mix.Tasks.LazyDoc do
     end
   end
 
-  @doc File.read!("lazy_doc/mix/tasks/lazy_doc/insert_module_doc.md")
+  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/insert_module_doc.md")
   def insert_module_doc(ast, module_ast, ast_doc) do
     {new_ast, _acc} =
       Macro.prewalk(
