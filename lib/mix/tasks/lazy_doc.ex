@@ -10,6 +10,7 @@ defmodule Mix.Tasks.LazyDoc do
   It enables the extraction of documentation using AI to enhance the documentation generation process, verifying and formatting documentation as per specified requirements. It handles reading the source code, interacting with a provider for documentation prompts, and writing the results back in a structured format.
   """
   alias LazyDoc.Provider
+  alias LazyDoc.Providers.GithubAi
 
   require Logger
   use Mix.Task
@@ -47,10 +48,20 @@ defmodule Mix.Tasks.LazyDoc do
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/write_to_file_formatted.md")
   def write_to_file_formatted(file, ast, comments) do
-    line_length = Application.get_env(:lazy_doc, :line_length, 98)
+    dot_formatter = Application.get_env(:lazy_doc, :file_formatter, ".formatter.exs")
+
+    {_func, formatter} =
+      Mix.Tasks.Format.formatter_for_file(file, dot_formatter: dot_formatter)
+
+    line_length = Keyword.get(formatter, :line_length, 98)
+    locals_without_parens = Keyword.get(formatter, :locals_without_parens, [])
 
     to_write =
-      Code.quoted_to_algebra(ast, comments: comments, escape: false)
+      Code.quoted_to_algebra(ast,
+        comments: comments,
+        escape: false,
+        locals_without_parens: locals_without_parens
+      )
       |> Inspect.Algebra.format(line_length)
       |> IO.iodata_to_binary()
 
@@ -129,7 +140,12 @@ defmodule Mix.Tasks.LazyDoc do
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/proccess_files.md")
   def proccess_files(entries) do
-    {provider_mod, model, params} = Application.get_env(:lazy_doc, :provider)
+    {provider_mod, model, params} =
+      Application.get_env(
+        :lazy_doc,
+        :provider,
+        {GithubAi, :gpt_4o_mini, [max_tokens: 2048, top_p: 1, temperature: 1]}
+      )
 
     final_function_prompt =
       Application.get_env(:lazy_doc, :custom_function_prompt, @default_function_prompt)
@@ -138,6 +154,10 @@ defmodule Mix.Tasks.LazyDoc do
       Application.get_env(:lazy_doc, :custom_module_prompt, @default_module_prompt)
 
     token = Application.get_env(:lazy_doc, :token)
+
+    if !token do
+      raise ArgumentError, message: "Token is required configuration."
+    end
 
     model_text = Provider.model(provider_mod, model)
 

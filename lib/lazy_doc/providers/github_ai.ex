@@ -11,10 +11,8 @@ defmodule LazyDoc.Providers.GithubAi do
   """
   @behaviour LazyDoc.Provider
 
-  @github_ai_endpoint "https://models.github.ai/inference/chat/completions"
+  @github_ai_endpoint "https://models.inference.ai.azure.com/chat/completions"
 
-  ## TO_DO: make timeout,temperature, top_p and max_tokens customizable but with default values.
-  ## TO_DO: implement retry with customizable number of retries if fails but with default value.
   @spec request_prompt(binary(), binary(), binary(), keyword()) ::
           {:ok, Req.Response.t()} | {:error, Exception.t()}
   @doc File.read!("priv/lazy_doc/lazy_doc/providers/github_ai/request_prompt.md")
