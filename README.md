@@ -8,7 +8,7 @@
 Lazy Doc is a project for those who are lazy af to document their code.
 
 It is designed to detect undocumented functions, pass the function to an AI
-provider which is a tuple of two elements `{GithubAi, :codestral}`.
+provider which is a tuple of three elements `{GithubAi, :codestral, options}`.
 
 ## Installation
 
