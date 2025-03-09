@@ -2,7 +2,6 @@
 
 <p align='center'>
 <a href="https://pxp9.github.io/lazy-doc/"><img alt="Static Badge" src="https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=github&logoColor=white&label=Read%20the%20article!&link=https%3A%2F%2Fpxp9.github.io%2Flazy-doc"></a>
-
 <a href="https://elixirforum.com/t/lazydoc-detect-undocumented-functions-and-pass-the-function-to-an-ai-provider-to-document-it/69818"><img alt="Static Badge" src="https://img.shields.io/badge/elixir-%25234B275F.svg?style=for-the-badge&logo=elixir&logoColor=white&label=Read%20the%20post!&color=purple&link=https%3A%2F%2Felixirforum.com%2Ft%2Flazydoc-detect-undocumented-functions-and-pass-the-function-to-an-ai-provider-to-document-it%2F69818"></a>
 </p>
 
