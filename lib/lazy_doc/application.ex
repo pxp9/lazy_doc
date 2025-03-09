@@ -1,7 +1,7 @@
 defmodule LazyDoc.Application do
   @moduledoc """
 
-  The module LazyDoc.Application is responsible for managing the application lifecycle in the LazyDoc framework.
+  The module LazyDoc.Application is responsible for managing the application startup.
 
   ## Description
 
