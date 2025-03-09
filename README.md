@@ -1,9 +1,9 @@
 # LazyDoc
 
 <p align='center'>
-<img alt="Static Badge" src="https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=github&logoColor=white&label=Read%20the%20article!&link=https%3A%2F%2Fpxp9.github.io%2Flazy-doc">
+<a href="https://pxp9.github.io/lazy-doc/"><img alt="Static Badge" src="https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=github&logoColor=white&label=Read%20the%20article!&link=https%3A%2F%2Fpxp9.github.io%2Flazy-doc"></a>
 
-<img alt="Static Badge" src="https://img.shields.io/badge/elixir-%25234B275F.svg?style=for-the-badge&logo=elixir&logoColor=white&label=Read%20the%20post!&color=purple&link=https%3A%2F%2Felixirforum.com%2Ft%2Flazydoc-detect-undocumented-functions-and-pass-the-function-to-an-ai-provider-to-document-it%2F69818">
+<a href="https://elixirforum.com/t/lazydoc-detect-undocumented-functions-and-pass-the-function-to-an-ai-provider-to-document-it/69818"><img alt="Static Badge" src="https://img.shields.io/badge/elixir-%25234B275F.svg?style=for-the-badge&logo=elixir&logoColor=white&label=Read%20the%20post!&color=purple&link=https%3A%2F%2Felixirforum.com%2Ft%2Flazydoc-detect-undocumented-functions-and-pass-the-function-to-an-ai-provider-to-document-it%2F69818"></a>
 </p>
 
 Lazy Doc is a project for those who are lazy af to document their code.
@@ -26,28 +26,37 @@ end
 `config/config.exs`
 
 ``` elixir
-## alias of GithubAi above
 import Config
 alias LazyDoc.Providers.GithubAi
 ## configure formatter.
 config :lazy_doc,
+  ## This is the default value, no need to configure.
+  ## This option creates the docs in files under priv/lazy_doc directory. 
+  external_docs: false,
+  ## This is the default value, no need to configure.
   patterns: [
    ~r"^lib/[a-zA-Z_]+(?:/[a-zA-Z_]+)*/[a-zA-Z_]+\.ex$",
   ],
-  max_retries: 3,
+  ## This is the default value, no need to configure.
+  max_retries: 1,
+  ## This is the default value, no need to configure.
   receive_timeout: 15_000,
+  ## This is the default value, no need to configure.
   file_formatter: ".formatter.exs",
+  ## This is the default value, no need to configure.
   provider: {GithubAi, :gpt_4o_mini, [max_tokens: 2048, top_p: 1, temperature: 1]},
+  ## This is the default value, no need to configure.
   custom_function_prompt:
     ~s(You should describe the parameters based on the spec given and give a small description of the following function.\n\nPlease do it in the following format given as an example, important do not return the header of the function, do not return a explanation of the function, your output must be only the docs in the following format.\n\n@doc """\n\n## Parameters\n\n- transaction_id - foreign key of the Transactions table.\n## Description\n Performs a search in the database\n\n## Returns\n the Transaction corresponding to transaction_id\n\n"""\n\nFunction to document:\n),
+  ## This is the default value, no need to configure.
   custom_module_prompt:
-    ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\n ## Main functionality\n\n The module GithubAi provides a way of communicating with Github AI API.\n\n ## Description\n\n It implements the behavior Provider a standard way to use a provider in LazyDoc.\n"""\n\nModule to document:\n)
-
+    ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\nThe module GithubAi provides a way of communicating with Github AI API \(describes the main functionality of the module\).\n\n## Description\n\nIt implements the behavior Provider a standard way to use a provider in LazyDoc.\(gives a detailed description of what the module does\)\n"""\n\nModule to document:\n)
 ```
 
 `config/runtime.exs`
 
 ``` elixir
+## Required to be configured
 config :lazy_doc, :token, System.get_env("API_TOKEN")
 ```
 
@@ -56,6 +65,10 @@ config :lazy_doc, :token, System.get_env("API_TOKEN")
 ``` bash
 API_TOKEN="YOUR AWESOME TOKEN"
 ```
+
+### Available Providers implemented by LazyDoc
+
+You can check Providers implemented in LazyDoc [here](https://hexdocs.pm/lazy_doc/github_ai.html).
 
 ## How to run it ?
 

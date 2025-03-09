@@ -57,9 +57,23 @@ defmodule LazyDoc.MixProject do
     [
       main: "readme",
       source_ref: "#{@version}",
+      extra_section: "GUIDES",
+      extras: extras(),
+      groups_for_extras: groups_for_extras(),
       source_url: github_link(),
-      skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
-      extras: ["README.md"]
+      skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
+    ]
+  end
+
+  defp extras do
+    ["README.md"] ++
+      Path.wildcard("guides/*/*.md")
+  end
+
+  defp groups_for_extras do
+    [
+      Introduction: ~r"guides/introduction/",
+      Providers: ~r"guides/providers/"
     ]
   end
 
@@ -70,7 +84,7 @@ defmodule LazyDoc.MixProject do
   defp deps do
     [
       {:dotenv, "~> 3.1.0", only: [:dev, :test]},
-      {:req, "~> 0.4.0"},
+      {:req, "~> 0.4"},
       {:jason, "~> 1.0"},
       ## Testing and converalls
       {:plug, "~> 1.0", only: :test},

@@ -1,13 +1,11 @@
 defmodule Mix.Tasks.LazyDoc do
   @moduledoc """
 
-  ## Main functionality
-
-  The module Mix.Tasks.LazyDoc provides a Mix task for processing source files to extract and format documentation for Elixir modules and functions.
+  The module Mix.Tasks.LazyDoc provides a Mix task for generating and inserting documentation into Elixir modules using an AI-powered provider.
 
   ## Description
 
-  It enables the extraction of documentation using AI to enhance the documentation generation process, verifying and formatting documentation as per specified requirements. It handles reading the source code, interacting with a provider for documentation prompts, and writing the results back in a structured format.
+  It orchestrates the extraction of data from source files, interacts with a specified AI provider to produce documentation for both modules and functions, and writes the generated documentation back into the respective source files. The task ensures necessary configurations such as tokens and provider parameters are validated before proceeding with the documentation generation process. Additionally, it handles file writing operations in a formatted manner and maintains the structure of the Elixir AST while inserting documentation comments.
   """
   alias LazyDoc.Provider
   alias LazyDoc.Providers.GithubAi
@@ -17,7 +15,7 @@ defmodule Mix.Tasks.LazyDoc do
 
   @default_function_prompt ~s(You should describe the parameters based on the spec given and give a small description of the following function.\n\nPlease do it in the following format given as an example, important do not return the header of the function, do not return a explanation of the function, your output must be only the docs in the following format:\n\nReturns the Transaction corresponding to transaction_id\(Initial sentence indicating what returns the function\)\n\n## Parameters\n\n- transaction_id - foreign key of the Transactions table.\n## Description\n Performs a search in the database\n\nFunction to document:\n)
 
-  @default_module_prompt ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\n## Main functionality\n\nThe module GithubAi provides a way of communicating with Github AI API.\n\n## Description\n\nIt implements the behavior Provider a standard way to use a provider in LazyDoc.\n"""\n\nModule to document:\n)
+  @default_module_prompt ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\nThe module GithubAi provides a way of communicating with Github AI API \(describes the main functionality of the module\).\n\n## Description\n\nIt implements the behavior Provider a standard way to use a provider in LazyDoc.\(gives a detailed description of what the module does\)\n"""\n\nModule to document:\n)
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/run.md")
   def run(_command_line_args) do
