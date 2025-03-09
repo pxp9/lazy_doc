@@ -26,20 +26,29 @@ end
 `config/config.exs`
 
 ``` elixir
-## alias of GithubAi above
 import Config
 alias LazyDoc.Providers.GithubAi
 ## configure formatter.
 config :lazy_doc,
+  ## This is the default value, no need to configure.
+  ## This option creates the docs in files under priv/lazy_doc directory. 
+  external_docs: false,
+  ## This is the default value, no need to configure.
   patterns: [
    ~r"^lib/[a-zA-Z_]+(?:/[a-zA-Z_]+)*/[a-zA-Z_]+\.ex$",
   ],
-  max_retries: 3,
+  ## This is the default value, no need to configure.
+  max_retries: 1,
+  ## This is the default value, no need to configure.
   receive_timeout: 15_000,
+  ## This is the default value, no need to configure.
   file_formatter: ".formatter.exs",
+  ## This is the default value, no need to configure.
   provider: {GithubAi, :gpt_4o_mini, [max_tokens: 2048, top_p: 1, temperature: 1]},
+  ## This is the default value, no need to configure.
   custom_function_prompt:
     ~s(You should describe the parameters based on the spec given and give a small description of the following function.\n\nPlease do it in the following format given as an example, important do not return the header of the function, do not return a explanation of the function, your output must be only the docs in the following format.\n\n@doc """\n\n## Parameters\n\n- transaction_id - foreign key of the Transactions table.\n## Description\n Performs a search in the database\n\n## Returns\n the Transaction corresponding to transaction_id\n\n"""\n\nFunction to document:\n),
+  ## This is the default value, no need to configure.
   custom_module_prompt:
     ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\nThe module GithubAi provides a way of communicating with Github AI API \(describes the main functionality of the module\).\n\n## Description\n\nIt implements the behavior Provider a standard way to use a provider in LazyDoc.\(gives a detailed description of what the module does\)\n"""\n\nModule to document:\n)
 ```
@@ -47,6 +56,7 @@ config :lazy_doc,
 `config/runtime.exs`
 
 ``` elixir
+## Required to be configured
 config :lazy_doc, :token, System.get_env("API_TOKEN")
 ```
 
@@ -60,22 +70,27 @@ API_TOKEN="YOUR AWESOME TOKEN"
 
 #### Github AI API
 
-You can find the models you can use in this API [here](https://github.com/marketplace/models)
+You can find the models you can use in this API
+[here](https://github.com/marketplace/models)
 
-You can find the list of models implemented [here](https://github.com/pxp9/lazy_doc/blob/main/lib/lazy_doc/providers/github_ai.ex#L65)
+You can find the list of models implemented
+[here](https://github.com/pxp9/lazy_doc/blob/main/lib/lazy_doc/providers/github_ai.ex#L65)
 
-You can generate a token for this API [here](https://github.com/settings/tokens), it is just a regular Github token.
+You can generate a token for this API
+[here](https://github.com/settings/tokens), it is just a regular Github token.
 
 More models need to be implemented in the future for this API.
 
 #### Implement your own provider
 
-To implement your own provider and use it you just need to implement the `LazyDoc.Provider` behavior for a module,
-and then you need to configure the `:provider` option.
+To implement your own provider and use it you just need to implement the
+`LazyDoc.Provider` behavior for a module, and then you need to configure the
+`:provider` option.
 
-```elixir
+``` elixir
   config :lazy_doc, provider: {MyAwesomeProvider, :my_fancy_model, [max_tokens: 2048, top_p: 1, temperature: 1] = _keyword_list_with_options},
 ```
+
 The tuple `:provider` has 3 elements:
 
 - name of the module which implements `LazyDoc.Provider`
