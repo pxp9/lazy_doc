@@ -68,34 +68,7 @@ API_TOKEN="YOUR AWESOME TOKEN"
 
 ### Available Providers implemented by LazyDoc
 
-#### Github AI API
-
-You can find the models you can use in this API
-[here](https://github.com/marketplace/models)
-
-You can find the list of models implemented
-[here](https://github.com/pxp9/lazy_doc/blob/main/lib/lazy_doc/providers/github_ai.ex#L65)
-
-You can generate a token for this API
-[here](https://github.com/settings/tokens), it is just a regular Github token.
-
-More models need to be implemented in the future for this API.
-
-#### Implement your own provider
-
-To implement your own provider and use it you just need to implement the
-`LazyDoc.Provider` behavior for a module, and then you need to configure the
-`:provider` option.
-
-``` elixir
-  config :lazy_doc, provider: {MyAwesomeProvider, :my_fancy_model, [max_tokens: 2048, top_p: 1, temperature: 1] = _keyword_list_with_options},
-```
-
-The tuple `:provider` has 3 elements:
-
-- name of the module which implements `LazyDoc.Provider`
-- the model to be used which is implemented in the given module.
-- keyword list which are options implemented in the given module.
+You can check Providers implemented in LazyDoc [here](https://hexdocs.pm/lazy_doc/github_ai.html).
 
 ## How to run it ?
 
