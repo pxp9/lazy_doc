@@ -1,6 +1,8 @@
 # LazyDoc
 
+<a href="https://pxp9.github.io/lazy-doc">
 ![Article](https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=github%20Pages&logoColor=white)
+</a>
 
 Lazy Doc is a project for those who are lazy af to document their code.
 
