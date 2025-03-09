@@ -1,5 +1,7 @@
 # LazyDoc
 
+![Article](https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=github%20Pages&logoColor=white)
+
 Lazy Doc is a project for those who are lazy af to document their code.
 
 It is designed to detect undocumented functions, pass the function to an AI
