@@ -1,13 +1,11 @@
 defmodule LazyDoc.Application do
   @moduledoc """
 
-  ## Main functionality
-
-  The module LazyDoc.Application is responsible for initiating the application process in the LazyDoc system.
+  The module LazyDoc.Application is responsible for managing the application lifecycle in the LazyDoc framework.
 
   ## Description
 
-  It provides a start function that allows for the initiation of application processes with specified start parameters. The function returns the process identifier of the newly started process, which can be utilized for further interactions within the application.
+  It implements the behavior of an Application, specifically defining the start function which is called when the application starts. The start function currently returns the process identifier of the calling process, indicating successful initialization of the application.
   """
   use Application
 

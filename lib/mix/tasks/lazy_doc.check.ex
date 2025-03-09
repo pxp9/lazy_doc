@@ -1,13 +1,11 @@
 defmodule Mix.Tasks.LazyDoc.Check do
   @moduledoc """
 
-  ## Main functionality
-
-  The module Mix.Tasks.LazyDoc.Check is designed to facilitate the checking of documentation for functions and modules within a codebase using the LazyDoc application.
+  The module Mix.Tasks.LazyDoc.Check provides a mix task for checking the documentation status of functions and modules within a project.
 
   ## Description
 
-  It initializes the LazyDoc application, identifies undocumented functions and modules across specified files, and exits with an appropriate status code based on the presence of undocumented elements. Warnings are logged for any undocumented functions and modules encountered during the check.
+  This module is designed to facilitate the documentation process in Elixir projects by identifying undocumented functions and modules. It functions as part of the LazyDoc toolset, which aims to improve code documentation practices. When the task is executed, it starts the LazyDoc application, extracts relevant data from files, and checks for any undocumented functions or modules. It logs warnings for each undocumented function in a module and for each undocumented module, and subsequently determines whether the documentation is complete or not, exiting with an appropriate status based on its findings. The use of this module encourages developers to maintain well-documented code, enhancing overall code quality and maintainability.
   """
   require Logger
   use Mix.Task

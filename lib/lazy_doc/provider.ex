@@ -1,13 +1,11 @@
 defmodule LazyDoc.Provider do
   @moduledoc """
 
-  ## Main functionality
-
-  The module LazyDoc.Provider provides a standard interface for making requests to an external service and processing the responses.
+  The module LazyDoc.Provider provides a standardized interface for making requests to various documentation providers through a defined set of operations.
 
   ## Description
 
-  It defines a set of callbacks and functions that allow a user to request a prompt, retrieve documents from a response, and interact with models, enabling flexible integration with various providers that conform to this interface.
+  It defines a set of callbacks that allow for interaction with a documentation provider, enabling the request of prompts, extraction of documentation from responses, and validation of parameters. This facilitates the seamless integration of different providers by allowing the specific implementation details to be abstracted away. The module also includes functions that utilize these callbacks, ensuring that any provider can be utilized in a uniform manner.
   """
   @callback request_prompt(
               prompt :: binary(),

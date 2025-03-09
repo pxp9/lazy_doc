@@ -41,8 +41,7 @@ config :lazy_doc,
   custom_function_prompt:
     ~s(You should describe the parameters based on the spec given and give a small description of the following function.\n\nPlease do it in the following format given as an example, important do not return the header of the function, do not return a explanation of the function, your output must be only the docs in the following format.\n\n@doc """\n\n## Parameters\n\n- transaction_id - foreign key of the Transactions table.\n## Description\n Performs a search in the database\n\n## Returns\n the Transaction corresponding to transaction_id\n\n"""\n\nFunction to document:\n),
   custom_module_prompt:
-    ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\n ## Main functionality\n\n The module GithubAi provides a way of communicating with Github AI API.\n\n ## Description\n\n It implements the behavior Provider a standard way to use a provider in LazyDoc.\n"""\n\nModule to document:\n)
-
+    ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\nThe module GithubAi provides a way of communicating with Github AI API \(describes the main functionality of the module\).\n\n## Description\n\nIt implements the behavior Provider a standard way to use a provider in LazyDoc.\(gives a detailed description of what the module does\)\n"""\n\nModule to document:\n)
 ```
 
 `config/runtime.exs`
@@ -56,6 +55,32 @@ config :lazy_doc, :token, System.get_env("API_TOKEN")
 ``` bash
 API_TOKEN="YOUR AWESOME TOKEN"
 ```
+
+### Available Providers implemented by LazyDoc
+
+#### Github AI API
+
+You can find the models you can use in this API [here](https://github.com/marketplace/models)
+
+You can find the list of models implemented [here](https://github.com/pxp9/lazy_doc/blob/main/lib/lazy_doc/providers/github_ai.ex#L65)
+
+You can generate a token for this API [here](https://github.com/settings/tokens), it is just a regular Github token.
+
+More models need to be implemented in the future for this API.
+
+#### Implement your own provider
+
+To implement your own provider and use it you just need to implement the `LazyDoc.Provider` behavior for a module,
+and then you need to configure the `:provider` option.
+
+```elixir
+  config :lazy_doc, provider: {MyAwesomeProvider, :my_fancy_model, [max_tokens: 2048, top_p: 1, temperature: 1] = _keyword_list_with_options},
+```
+The tuple `:provider` has 3 elements:
+
+- name of the module which implements `LazyDoc.Provider`
+- the model to be used which is implemented in the given module.
+- keyword list which are options implemented in the given module.
 
 ## How to run it ?
 

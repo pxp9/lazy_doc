@@ -1,15 +1,13 @@
 defmodule LazyDoc do
-  @global_path "lib/**/*.ex"
   @moduledoc """
 
-  ## Main functionality
-
-  The module LazyDoc provides a way to extract and organize documentation from Elixir source files by reading them, parsing their abstract syntax tree (AST), and collecting relevant information about modules, functions, and comments.
+  The module LazyDoc provides an interface for extracting and processing documentation and code information from Elixir source files.
 
   ## Description
 
-  It implements functions to read files matching a given path pattern, extract their AST and comments, group function definitions by names and arities, filter out undocumented functions and modules, and retrieve associated documentation for the extracted modules. The module serves as a utility for generating or managing documentation for Elixir projects.
+  It implements functionality to scan Elixir source files within a specified path, extract module and function definitions, group related functions by name (taking arity into account), and filter undocumented or documented functions and modules. The primary purpose of LazyDoc is to facilitate the automation of generating documentation by analyzing source code, managing documentation for function overloads, and providing insights into which parts of the codebase are lacking documentation.
   """
+  @global_path "lib/**/*.ex"
 
   @doc File.read!("priv/lazy_doc/lazy_doc/extract_data_from_files.md")
   def extract_data_from_files() do
@@ -255,8 +253,8 @@ defmodule LazyDoc do
 
   @doc File.read!("priv/lazy_doc/lazy_doc/filter_undocumented_functions.md")
   def filter_undocumented_functions(
-        {module, module_ast, _code_mod, functions},
-        {_mod, {_module_doc, function_docs}}
+        {module, module_ast, _code_mod, functions} = _module_tuple,
+        {_mod, {_module_doc, function_docs}} = _mod_docs
       ) do
     ## Filter the private functions
     ## we already merged the code if it was necessary
@@ -273,8 +271,8 @@ defmodule LazyDoc do
 
   @doc File.read!("priv/lazy_doc/lazy_doc/filter_documented_functions.md")
   def filter_documented_functions(
-        {module, module_ast, _code_mod, functions},
-        {_mod, {_module_doc, function_docs}}
+        {module, module_ast, _code_mod, functions} = _module_tuple,
+        {_mod, {_module_doc, function_docs}} = _mod_docs
       ) do
     functions =
       Enum.filter(functions, fn {type, {func_name, _code}} ->

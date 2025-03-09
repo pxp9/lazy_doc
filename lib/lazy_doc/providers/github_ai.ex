@@ -1,13 +1,11 @@
 defmodule LazyDoc.Providers.GithubAi do
   @moduledoc """
 
-  ## Main functionality
-
-  The module LazyDoc.Providers.GithubAi provides a way of interacting with the Github AI API for prompt-based communication and response generation.
+  The module LazyDoc.Providers.GithubAi provides an interface for interacting with the Github AI API, facilitating access to AI-powered code generation and completion functionalities.
 
   ## Description
 
-  It implements the behavior Provider, offering a standardized method to request and retrieve responses from AI models hosted on the Github AI platform. Key operations include sending prompts, constructing API requests, and processing responses.
+  This module defines a provider behavior for the LazyDoc library, specifically tailored for making requests to the Github AI API. It allows users to send prompts to the API and retrieve generated responses based on specified models and parameters. The functionality includes constructing requests with necessary headers and parameters, handling the responses received from the API, and providing a way to validate the parameters used in the requests. Additionally, it supports the specification of different AI models that can be utilized for generating completions, making this module a flexible tool for leveraging AI in documentation and development processes.
   """
   @behaviour LazyDoc.Provider
 
