@@ -1,5 +1,11 @@
 # LazyDoc
 
+<p align='center'>
+<img alt="Static Badge" src="https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=github&logoColor=white&label=Read%20the%20article!&link=https%3A%2F%2Fpxp9.github.io%2Flazy-doc">
+
+<img alt="Static Badge" src="https://img.shields.io/badge/elixir-%25234B275F.svg?style=for-the-badge&logo=elixir&logoColor=white&label=Read%20the%20post!&color=purple&link=https%3A%2F%2Felixirforum.com%2Ft%2Flazydoc-detect-undocumented-functions-and-pass-the-function-to-an-ai-provider-to-document-it%2F69818">
+</p>
+
 Lazy Doc is a project for those who are lazy af to document their code.
 
 It is designed to detect undocumented functions, pass the function to an AI
@@ -76,7 +82,8 @@ If the user creates an inner module with the same name as the parent module
 `lazy_doc`, it wont work properly because they have the same `:__aliases__` AST
 node.
 
-> Note: this limitation it is only in module names. So if the user have same
+> [!WARNING]
+> This limitation it is only in module names. So if the user have same
 > names of functions in different modules or in the same module, it will work.
 
 ``` elixir
