@@ -76,7 +76,7 @@ If the user creates an inner module with the same name as the parent module
 `lazy_doc`, it wont work properly because they have the same `:__aliases__` AST
 node.
 
-> ![NOTE]
+> [!WARNING]
 > This limitation it is only in module names. So if the user have same
 > names of functions in different modules or in the same module, it will work.
 
