@@ -48,3 +48,5 @@ npm-debug.log
 /priv/cldr/*
 
 .vscode
+
+lazy_doc

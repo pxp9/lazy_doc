@@ -23,14 +23,14 @@ defmodule Mix.Tasks.LazyDoc do
 
     _result = Application.ensure_started(:telemetry)
 
-    _result = Req.Application.start("", "")
+    if Code.loaded?(Req.Application) do
+    _result = Application.ensure_started(:req)
+    end |> dbg()
 
-    _result = LazyDoc.Application.start("", "")
+    if File.exists?("config/config.exs"), do: Mix.Task.run("loadconfig", ["config/config.exs"])
+    if File.exists?("config/runtime.exs"), do: Mix.Task.run("loadconfig", ["config/runtime.exs"])
 
-    ## Runs the runtime.exs from the client
-    Mix.Task.run("app.config")
-
-    LazyDoc.extract_data_from_files()
+    LazyDoc.Util.extract_data_from_files()
     |> proccess_files()
   end
 

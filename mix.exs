@@ -7,6 +7,7 @@ defmodule LazyDoc.MixProject do
     [
       app: :lazy_doc,
       version: @version,
+      escript: escript(),
       elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -37,8 +38,13 @@ defmodule LazyDoc.MixProject do
       name: "lazy_doc",
       maintainers: ["Pepe Marquez"],
       licenses: ["MIT"],
-      links: %{"GitHub" => github_link()}
+      links: %{"GitHub" => github_link()},
+      files: ~w(lib priv mix.exs README.md)
     ]
+  end
+
+  def escript do
+    [main_module: LazyDoc.CLI, embed_elixir: true, strip_beams: [keep: ["Docs"]]]
   end
 
   defp github_link() do
@@ -48,8 +54,7 @@ defmodule LazyDoc.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {LazyDoc.Application, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger, :req, :jason, :mix]
     ]
   end
 
@@ -83,8 +88,8 @@ defmodule LazyDoc.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:dotenv, "~> 3.1.0", only: [:dev, :test]},
-      {:req, "~> 0.4"},
+      {:dotenv, "~> 3.1.0", only: :dev},
+      {:req, "~> 0.4", optional: true},
       {:jason, "~> 1.0"},
       ## Testing and converalls
       {:plug, "~> 1.0", only: :test},
