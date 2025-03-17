@@ -23,9 +23,9 @@ defmodule Mix.Tasks.LazyDoc do
 
     _result = Application.ensure_started(:telemetry)
 
-    if Code.loaded?(Req.Application) do
-    _result = Application.ensure_started(:req)
-    end |> dbg()
+    if Code.ensure_loaded?(Req) do
+      Application.ensure_started(:req)
+    end
 
     if File.exists?("config/config.exs"), do: Mix.Task.run("loadconfig", ["config/config.exs"])
     if File.exists?("config/runtime.exs"), do: Mix.Task.run("loadconfig", ["config/runtime.exs"])

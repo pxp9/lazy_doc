@@ -103,11 +103,13 @@ defmodule Mix.Tasks.LazyDoc.Clean do
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.clean/clean_tree?.md")
   def clean_tree?() do
-    "git"
-    |> System.cmd(["diff-files", "--quiet"])
-    |> clean_tree()
-  rescue
-    ErlangError -> true
+    if File.exists?(".git") do
+      "git"
+      |> System.cmd(["diff-files", "--quiet"])
+      |> clean_tree()
+    else
+      true
+    end
   end
 
   defp clean_tree({_, 0}), do: true
