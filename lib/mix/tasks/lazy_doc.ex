@@ -196,19 +196,23 @@ defmodule Mix.Tasks.LazyDoc do
           Enum.empty?(functions)
         end)
 
-      if module_docs or function_docs do
-        elem = if function_docs, do: Enum.at(entry.functions, 0), else: Enum.at(entry.modules, 0)
-
-        compile_path =
-          elem
-          |> then(fn {mod, _mod_ast, _} -> mod end)
-          |> :code.which()
-          |> Path.relative_to_cwd()
-          |> Path.dirname()
-
-        write_to_file_formatted(entry.file, compile_path, acc, entry.comments)
-      end
+      write_files(module_docs or function_docs, entry, acc)
     end)
+  end
+
+  defp write_files(must_write?, entry, ast) do
+    if must_write? do
+      elem = Enum.at(entry.functions_documented, 0)
+
+      compile_path =
+        elem
+        |> then(fn {mod, _mod_ast, _} -> mod end)
+        |> :code.which()
+        |> Path.relative_to_cwd()
+        |> Path.dirname()
+
+      Mix.Tasks.LazyDoc.write_to_file_formatted(entry.file, compile_path, ast, entry.comments)
+    end
   end
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/insert_nodes_in_module.md")

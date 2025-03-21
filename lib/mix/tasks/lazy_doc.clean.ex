@@ -35,19 +35,23 @@ defmodule Mix.Tasks.LazyDoc.Clean do
           Enum.empty?(functions)
         end)
 
-      if functions_documented? do
-        elem = Enum.at(entry.functions_documented, 0)
-
-        compile_path =
-          elem
-          |> then(fn {mod, _mod_ast, _} -> mod end)
-          |> :code.which()
-          |> Path.relative_to_cwd()
-          |> Path.dirname()
-
-        Mix.Tasks.LazyDoc.write_to_file_formatted(entry.file, compile_path, ast, entry.comments)
-      end
+      write_files(functions_documented?, entry, ast)
     end)
+  end
+
+  defp write_files(must_write?, entry, ast) do
+    if must_write? do
+      elem = Enum.at(entry.functions_documented, 0)
+
+      compile_path =
+        elem
+        |> then(fn {mod, _mod_ast, _} -> mod end)
+        |> :code.which()
+        |> Path.relative_to_cwd()
+        |> Path.dirname()
+
+      Mix.Tasks.LazyDoc.write_to_file_formatted(entry.file, compile_path, ast, entry.comments)
+    end
   end
 
   defp delete_function_docs_from_ast(acc, functions, mod_ast) do

@@ -12,7 +12,7 @@ defmodule LazyDoc.CLI do
     Application.ensure_all_started([:lazy_doc, :logger, :req])
 
     Path.wildcard("_build/dev/lib/**/ebin/")
-    |> Enum.map(fn path ->
+    |> Enum.each(fn path ->
       :code.add_path(String.to_charlist(path))
     end)
 
