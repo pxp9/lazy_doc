@@ -44,7 +44,7 @@ defmodule LazyDoc.MixProject do
   end
 
   def escript do
-    [main_module: LazyDoc.CLI, embed_elixir: true, strip_beams: [keep: ["Docs"]]]
+    [app: nil, main_module: LazyDoc.CLI, embed_elixir: true, strip_beams: [keep: ["Docs"]]]
   end
 
   defp github_link() do
@@ -89,7 +89,7 @@ defmodule LazyDoc.MixProject do
   defp deps do
     [
       {:dotenv, "~> 3.1.0", only: [:dev, :test]},
-      {:req, "~> 0.4", optional: true},
+      {:req, "~> 0.5"},
       {:jason, "~> 1.0"},
       ## Testing and converalls
       {:plug, "~> 1.0", only: :test},

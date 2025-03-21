@@ -18,8 +18,6 @@ defmodule Mix.Tasks.LazyDoc.Clean do
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.clean/run.md")
   def run(_command_line_args) do
-    if File.exists?("config/config.exs"), do: Mix.Task.run("loadconfig", ["config/config.exs"])
-    if File.exists?("config/runtime.exs"), do: Mix.Task.run("loadconfig", ["config/runtime.exs"])
 
     if not clean_tree?() do
       IO.puts("Uncommitted changes detected.\nPlease stash your changes before running this task")
@@ -33,7 +31,21 @@ defmodule Mix.Tasks.LazyDoc.Clean do
           delete_function_docs_from_ast(acc, functions, mod_ast)
         end)
 
-      Mix.Tasks.LazyDoc.write_to_file_formatted(entry.file, ast, entry.comments)
+      functions_documented? =
+        not Enum.all?(entry.functions_documented, fn {_mod, _mod_ast, functions} -> Enum.empty?(functions) end)
+
+      if functions_documented? do
+        elem = Enum.at(entry.functions_documented, 0)
+
+        compile_path =
+          elem
+          |> then(fn {mod, _mod_ast, _} -> mod end)
+          |> :code.which()
+          |> Path.relative_to_cwd()
+          |> Path.dirname()
+
+        Mix.Tasks.LazyDoc.write_to_file_formatted(entry.file, compile_path, ast, entry.comments)
+      end
     end)
   end
 

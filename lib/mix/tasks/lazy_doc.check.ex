@@ -12,9 +12,6 @@ defmodule Mix.Tasks.LazyDoc.Check do
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.check/run.md")
   def run(_command_line_args) do
-    if File.exists?("config/config.exs"), do: Mix.Task.run("loadconfig", ["config/config.exs"])
-    if File.exists?("config/runtime.exs"), do: Mix.Task.run("loadconfig", ["config/runtime.exs"])
-
     values =
       LazyDoc.Util.extract_data_from_files()
       |> Enum.map(fn entry ->

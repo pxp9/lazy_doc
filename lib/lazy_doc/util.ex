@@ -50,7 +50,6 @@ defmodule LazyDoc.Util do
         |> Enum.map(fn {module, {module_doc, func_docs}} ->
           {module, {module_doc, group_docs_different_arities(func_docs)}}
         end)
-        |> dbg()
 
       zip_to_process =
         Enum.zip(names_per_module, docs_per_module)

@@ -1,7 +1,8 @@
-Returns the result of executing different operations based on the provided arguments.
+Returns the result of executing the main application functionality based on command-line arguments.
 
 ## Parameters
 
-- args - a list of command line arguments that dictate the operation to perform.
+- args - a list of command-line arguments to determine the action to be taken.
+  
 ## Description
- Parses the arguments and executes the corresponding Mix task based on the input.
+ Initializes application dependencies, loads configuration files, and executes different tasks based on the provided arguments.
