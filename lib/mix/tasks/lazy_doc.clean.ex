@@ -18,7 +18,6 @@ defmodule Mix.Tasks.LazyDoc.Clean do
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.clean/run.md")
   def run(_command_line_args) do
-
     if not clean_tree?() do
       IO.puts("Uncommitted changes detected.\nPlease stash your changes before running this task")
       exit({:shutdown, 1})
@@ -32,7 +31,9 @@ defmodule Mix.Tasks.LazyDoc.Clean do
         end)
 
       functions_documented? =
-        not Enum.all?(entry.functions_documented, fn {_mod, _mod_ast, functions} -> Enum.empty?(functions) end)
+        not Enum.all?(entry.functions_documented, fn {_mod, _mod_ast, functions} ->
+          Enum.empty?(functions)
+        end)
 
       if functions_documented? do
         elem = Enum.at(entry.functions_documented, 0)
