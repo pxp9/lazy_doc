@@ -1,4 +1,4 @@
-defmodule LazyDoc do
+defmodule LazyDoc.Util do
   @moduledoc """
 
   The module LazyDoc provides an interface for extracting and processing documentation and code information from Elixir source files.

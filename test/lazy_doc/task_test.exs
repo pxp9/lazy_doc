@@ -29,7 +29,7 @@ defmodule LazyDoc.TaskTest do
       ]
 
     name_extraction =
-      LazyDoc.extract_names(ast)
+      LazyDoc.Util.extract_names(ast)
       |> Enum.map(fn {:module, mod, mod, _code_mod, functions} ->
         {:module, mod, mod, functions}
       end)
@@ -45,7 +45,7 @@ defmodule LazyDoc.TaskTest do
 
     assert commets_texts == expected_comments
 
-    names_with_clauses_joined = functions |> LazyDoc.join_code_from_clauses()
+    names_with_clauses_joined = functions |> LazyDoc.Util.join_code_from_clauses()
 
     expected_names =
       [
@@ -63,7 +63,7 @@ defmodule LazyDoc.TaskTest do
   end
 
   test "docs per module" do
-    docs_per_module = LazyDoc.docs_per_module([LazyDoc.Example])
+    docs_per_module = LazyDoc.Util.docs_per_module([LazyDoc.Example])
 
     # This module is full documented so it returns none functions, it just returns the @module_doc
     # maybe returning the module_doc is wrong when we implement the @module_doc
@@ -101,7 +101,7 @@ defmodule LazyDoc.TaskTest do
 
     assert docs_per_module == expected_result
 
-    docs_per_module = LazyDoc.docs_per_module([LazyDoc.ExampleModule])
+    docs_per_module = LazyDoc.Util.docs_per_module([LazyDoc.ExampleModule])
 
     expected_result =
       [
@@ -132,24 +132,24 @@ defmodule LazyDoc.TaskTest do
       )
 
     name_module =
-      LazyDoc.extract_names(ast)
+      LazyDoc.Util.extract_names(ast)
       |> Enum.map(fn {:module, module_name, module_ast, code_mod, functions} ->
         {module_name |> Module.concat(), module_ast, code_mod,
-         LazyDoc.join_code_from_clauses(functions)}
+         LazyDoc.Util.join_code_from_clauses(functions)}
       end)
       |> Enum.find(fn {module_name, _module_ast, _code_mod, _functions} ->
         module_name == LazyDoc.ExampleModule
       end)
 
     docs_per_module =
-      LazyDoc.docs_per_module([LazyDoc.ExampleModule])
+      LazyDoc.Util.docs_per_module([LazyDoc.ExampleModule])
       |> Enum.map(fn {module, {module_doc, func_docs}} ->
-        {module, {module_doc, LazyDoc.group_docs_different_arities(func_docs)}}
+        {module, {module_doc, LazyDoc.Util.group_docs_different_arities(func_docs)}}
       end)
       |> Enum.at(0)
 
     {_module, _module_ast, functions_to_document} =
-      LazyDoc.filter_undocumented_functions(name_module, docs_per_module)
+      LazyDoc.Util.filter_undocumented_functions(name_module, docs_per_module)
 
     assert functions_to_document |> Enum.map(fn {:function, {name, _code}} -> name end) == [
              :hihi,

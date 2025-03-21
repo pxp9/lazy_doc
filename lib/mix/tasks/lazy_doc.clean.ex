@@ -18,24 +18,40 @@ defmodule Mix.Tasks.LazyDoc.Clean do
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.clean/run.md")
   def run(_command_line_args) do
-    _result = LazyDoc.Application.start("", "")
-
-    Mix.Task.run("app.config")
-
     if not clean_tree?() do
       IO.puts("Uncommitted changes detected.\nPlease stash your changes before running this task")
       exit({:shutdown, 1})
     end
 
-    LazyDoc.extract_data_from_files()
+    LazyDoc.Util.extract_data_from_files()
     |> Enum.each(fn entry ->
       ast =
         Enum.reduce(entry.functions_documented, entry.ast, fn {_mod, mod_ast, functions}, acc ->
           delete_function_docs_from_ast(acc, functions, mod_ast)
         end)
 
-      Mix.Tasks.LazyDoc.write_to_file_formatted(entry.file, ast, entry.comments)
+      functions_documented? =
+        not Enum.all?(entry.functions_documented, fn {_mod, _mod_ast, functions} ->
+          Enum.empty?(functions)
+        end)
+
+      write_files(functions_documented?, entry, ast)
     end)
+  end
+
+  defp write_files(must_write?, entry, ast) do
+    if must_write? do
+      elem = Enum.at(entry.functions_documented, 0)
+
+      compile_path =
+        elem
+        |> then(fn {mod, _mod_ast, _} -> mod end)
+        |> :code.which()
+        |> Path.relative_to_cwd()
+        |> Path.dirname()
+
+      Mix.Tasks.LazyDoc.write_to_file_formatted(entry.file, compile_path, ast, entry.comments)
+    end
   end
 
   defp delete_function_docs_from_ast(acc, functions, mod_ast) do
@@ -104,11 +120,13 @@ defmodule Mix.Tasks.LazyDoc.Clean do
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.clean/clean_tree?.md")
   def clean_tree?() do
-    "git"
-    |> System.cmd(["diff-files", "--quiet"])
-    |> clean_tree()
-  rescue
-    ErlangError -> true
+    if File.exists?(".git") do
+      "git"
+      |> System.cmd(["diff-files", "--quiet"])
+      |> clean_tree()
+    else
+      true
+    end
   end
 
   defp clean_tree({_, 0}), do: true

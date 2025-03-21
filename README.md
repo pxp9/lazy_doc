@@ -15,12 +15,20 @@ provider which is a tuple of three elements `{GithubAi, :codestral, options}`.
 ``` elixir
 def deps do
   [
-    {:lazy_doc, "~> 0.5.4"}
+    {:lazy_doc, "~> 0.5.5"}
   ]
 end
 ```
 
+or install it as a single binary
+
+``` bash
+mix escript.install hex lazy_doc 0.5.5
+```
+
 ## Configuration
+
+Configuration is the same if you are using the binary or the dep.
 
 `config/config.exs`
 
@@ -67,9 +75,12 @@ API_TOKEN="YOUR AWESOME TOKEN"
 
 ### Available Providers implemented by LazyDoc
 
-You can check Providers implemented in LazyDoc [here](https://hexdocs.pm/lazy_doc/github_ai.html).
+You can check Providers implemented in LazyDoc
+[here](https://hexdocs.pm/lazy_doc/github_ai.html).
 
 ## How to run it ?
+
+### As a Elixir dependency
 
 From the root of the elixir project once installed and configured.
 
@@ -77,13 +88,31 @@ From the root of the elixir project once installed and configured.
 mix lazy_doc
 ```
 
-I would recommend to run a `mix format` after just in case.
-
 If you want, you can add a simple check to see what needs to be documented in
 your project. This is good for CI.
 
 ``` bash
 mix lazy_doc.check
+```
+
+### As a binary
+
+``` bash
+lazy_doc
+```
+
+``` bash
+lazy_doc --check
+```
+
+## Build the binary from source and install it.
+
+``` bash
+MIX_ENV=dev mix escript.build
+```
+
+``` bash
+MIX_ENV=dev mix escript.install
 ```
 
 ## Known limitations that wont be fixed.
@@ -94,9 +123,9 @@ If the user creates an inner module with the same name as the parent module
 `lazy_doc`, it wont work properly because they have the same `:__aliases__` AST
 node.
 
-> [!WARNING]
-> This limitation it is only in module names. So if the user have same
-> names of functions in different modules or in the same module, it will work.
+> \[\!WARNING\] This limitation it is only in module names. So if the user have
+> same names of functions in different modules or in the same module, it will
+> work.
 
 ``` elixir
 
@@ -158,3 +187,4 @@ produces the following AST
   issues, it will create a folder where all the docs is generated.
 - [X] Make a `mix lazy_doc.clean` task that will allow to clear all the docs for
   updating to new docs.
+- [X] Make lazy\_doc run in a single binary

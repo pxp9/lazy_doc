@@ -21,16 +21,9 @@ defmodule Mix.Tasks.LazyDoc do
   def run(_command_line_args) do
     ## Start req
 
-    _result = Application.ensure_started(:telemetry)
+    _result = Application.ensure_all_started([:req, :telemetry])
 
-    _result = Req.Application.start("", "")
-
-    _result = LazyDoc.Application.start("", "")
-
-    ## Runs the runtime.exs from the client
-    Mix.Task.run("app.config")
-
-    LazyDoc.extract_data_from_files()
+    LazyDoc.Util.extract_data_from_files()
     |> proccess_files()
   end
 
@@ -44,8 +37,8 @@ defmodule Mix.Tasks.LazyDoc do
     File.write(file, Macro.to_string(ast))
   end
 
-  @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/write_to_file_formatted.md")
-  def write_to_file_formatted(file, ast, comments) do
+  @doc File.read!("priv/lazy_doc/write_to_file_formatted.md")
+  def write_to_file_formatted(file, compile_path, ast, comments) do
     dot_formatter = Application.get_env(:lazy_doc, :file_formatter, ".formatter.exs")
 
     {_func, formatter} =
@@ -65,7 +58,12 @@ defmodule Mix.Tasks.LazyDoc do
 
     to_write = to_write <> "\n"
 
-    File.write(file, to_write)
+    result = File.write(file, to_write)
+
+    ## Spawn the compiler if we managed to write the file
+    if result == :ok do
+      Kernel.ParallelCompiler.compile_to_path([file], compile_path)
+    end
   end
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/insert_doc_for_function.md")
@@ -151,7 +149,7 @@ defmodule Mix.Tasks.LazyDoc do
     final_module_prompt =
       Application.get_env(:lazy_doc, :custom_module_prompt, @default_module_prompt)
 
-    token = Application.get_env(:lazy_doc, :token)
+    token = Application.get_env(:lazy_doc, :token, System.get_env("API_TOKEN"))
 
     if !token do
       raise ArgumentError, message: "Token is required configuration."
@@ -190,13 +188,31 @@ defmodule Mix.Tasks.LazyDoc do
           )
         end)
 
-      # TO_DO: probably we should check if the ast_acc is the same as entry.ast
-      # if true we should not write the file.
-      # A simple but effective will be if entry.functions is empty
-      # Do not write the file.
+      ## We need the directory where the `beam` file after the recompilation with the docs generated should be placed.
+      module_docs = not Enum.empty?(entry.modules)
 
-      write_to_file_formatted(entry.file, acc, entry.comments)
+      function_docs =
+        not Enum.all?(entry.functions, fn {_mod, _mod_ast, functions} ->
+          Enum.empty?(functions)
+        end)
+
+      write_files(module_docs or function_docs, entry, acc)
     end)
+  end
+
+  defp write_files(must_write?, entry, ast) do
+    if must_write? do
+      elem = Enum.at(entry.functions_documented, 0)
+
+      compile_path =
+        elem
+        |> then(fn {mod, _mod_ast, _} -> mod end)
+        |> :code.which()
+        |> Path.relative_to_cwd()
+        |> Path.dirname()
+
+      Mix.Tasks.LazyDoc.write_to_file_formatted(entry.file, compile_path, ast, entry.comments)
+    end
   end
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/insert_nodes_in_module.md")
