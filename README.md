@@ -80,13 +80,13 @@ You can check Providers implemented in LazyDoc
 
 ## How to run it ?
 
+### As a Elixir dependency
+
 From the root of the elixir project once installed and configured.
 
 ``` bash
 mix lazy_doc
 ```
-
-I would recommend to run a `mix format` after just in case.
 
 If you want, you can add a simple check to see what needs to be documented in
 your project. This is good for CI.
@@ -95,7 +95,7 @@ your project. This is good for CI.
 mix lazy_doc.check
 ```
 
-or if installed as a binary
+### As a binary
 
 ``` bash
 lazy_doc
@@ -105,13 +105,13 @@ lazy_doc
 lazy_doc --check
 ```
 
-## Build the binary and install it.
+## Build the binary from source and install it.
 
-```bash
+``` bash
 MIX_ENV=dev mix escript.build
 ```
 
-```bash
+``` bash
 MIX_ENV=dev mix escript.install
 ```
 
