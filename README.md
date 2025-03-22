@@ -15,7 +15,7 @@ provider which is a tuple of three elements `{GithubAi, :codestral, options}`.
 ``` elixir
 def deps do
   [
-    {:lazy_doc, "~> 0.5.7"}
+    {:lazy_doc, "~> 0.6.0"}
   ]
 end
 ```
@@ -23,14 +23,15 @@ end
 or install it as a single binary
 
 ``` bash
-mix escript.install hex lazy_doc 0.5.7
+mix escript.install hex lazy_doc 0.6.0
 ```
 
 ## Configuration
 
 Configuration is the same if you are using the binary or the dep.
 
-`config/config.exs`
+`config/lazy_doc.exs` It is expected to be in this file with Elixir config
+syntax.
 
 ``` elixir
 import Config
@@ -58,20 +59,48 @@ config :lazy_doc,
   ## This is the default value, no need to configure.
   custom_module_prompt:
     ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\nThe module GithubAi provides a way of communicating with Github AI API \(describes the main functionality of the module\).\n\n## Description\n\nIt implements the behavior Provider a standard way to use a provider in LazyDoc.\(gives a detailed description of what the module does\)\n"""\n\nModule to document:\n)
+
 ```
 
-`config/runtime.exs`
+> Note If installed as a dep you need to do this.
+
+`config/config.exs`
 
 ``` elixir
-## Required to be configured
-config :lazy_doc, :token, System.get_env("API_TOKEN")
+import_conf("lazy_doc.exs")
+  
 ```
+
+### API token conf
 
 `.env`
 
 ``` bash
 API_TOKEN="YOUR AWESOME TOKEN"
 ```
+
+if installed as dep
+
+`config/runtime.exs`
+
+``` elixir
+## Required to be configured
+config :lazy_doc, :token, System.get_env("API_TOKEN")  
+```
+
+if installed as binary
+
+``` bash
+export API_TOKEN="YOUR AWESOME TOKEN"
+```
+
+or
+
+``` bash
+export $(cat .env | xargs)  
+```
+
+By default `lazy_doc` will try to get the token from the env var `API_TOKEN`
 
 ### Available Providers implemented by LazyDoc
 

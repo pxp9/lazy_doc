@@ -351,13 +351,8 @@ defmodule LazyDoc.Util do
       :code.add_path(String.to_charlist(path))
     end)
 
-    if File.exists?("config/config.exs") do
-      Config.Reader.read!("config/config.exs")[:lazy_doc]
-      |> Enum.each(fn {k, v} -> Application.put_env(:lazy_doc, k, v) end)
-    end
-
-    if File.exists?("config/runtime.exs") do
-      Config.Reader.read!("config/runtime.exs")[:lazy_doc]
+    if File.exists?("config/lazy_doc.exs") do
+      Config.Reader.read!("config/lazy_doc.exs")[:lazy_doc]
       |> Enum.each(fn {k, v} -> Application.put_env(:lazy_doc, k, v) end)
     end
   end
