@@ -335,7 +335,8 @@ defmodule LazyDoc.Util do
 
   @doc File.read!("priv/lazy_doc/lazy_doc/util/load_modules_and_conf.md")
   def load_modules_and_conf() do
-    search_target = Path.wildcard("_build/dev/lib/**/ebin/")
+    mix_env = System.get_env("MIX_ENV", "dev")
+    search_target = Path.wildcard("_build/#{mix_env}/lib/**/ebin/")
 
     if Enum.empty?(search_target) do
       raise(
