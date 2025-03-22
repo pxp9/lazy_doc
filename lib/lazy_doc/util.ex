@@ -333,6 +333,7 @@ defmodule LazyDoc.Util do
     )
   end
 
+  @doc File.read!("priv/lazy_doc/lazy_doc/util/load_modules_and_conf.md")
   def load_modules_and_conf() do
     search_target = Path.wildcard("_build/dev/lib/**/ebin/")
 
@@ -361,6 +362,14 @@ defmodule LazyDoc.Util do
   end
 
   defmodule NotCompiledError do
+    @moduledoc """
+
+    The module NotCompiledError defines a custom exception that can be raised when a compilation error occurs in a program.
+
+    ## Description
+
+    It provides a standard way to create an exception with a customizable message, which can be used to indicate that a piece of code could not be compiled. This exception can be helpful in error handling scenarios, allowing developers to signify specific issues related to code compilation.
+    """
     defexception [:message]
   end
 end

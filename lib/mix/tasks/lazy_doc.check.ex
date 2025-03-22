@@ -11,14 +11,14 @@ defmodule Mix.Tasks.LazyDoc.Check do
   use Mix.Task
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.check/run.md")
-  def run(_command_line_args) do    
-
-    LazyDoc.Util.load_modules_and_conf()    
+  def run(_command_line_args) do
+    LazyDoc.Util.load_modules_and_conf()
 
     values =
       LazyDoc.Util.extract_data_from_files()
       |> Enum.map(fn entry ->
         Logger.info("Checking #{entry.file}")
+
         get_undocumented_functions(entry.functions, entry.file) != [] or
           get_undocumented_modules(entry.modules, entry.file)
       end)
