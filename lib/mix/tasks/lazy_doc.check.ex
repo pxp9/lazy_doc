@@ -13,8 +13,8 @@ defmodule Mix.Tasks.LazyDoc.Check do
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.check/run.md")
   def run(args) do
     Mix.Task.run("app.config")
-
     main(args)
+    :ok
   end
 
   @doc false

@@ -21,6 +21,7 @@ defmodule Mix.Tasks.LazyDoc do
   def run(args) do
     Mix.Task.run("app.config")
     main(args)
+    :ok
   end
 
   @doc false
