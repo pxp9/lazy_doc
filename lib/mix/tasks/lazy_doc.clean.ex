@@ -22,6 +22,7 @@ defmodule Mix.Tasks.LazyDoc.Clean do
     main(args)
   end
 
+  @doc false
   def main(_args) do
     if not clean_tree?() do
       IO.puts("Uncommitted changes detected.\nPlease stash your changes before running this task")
