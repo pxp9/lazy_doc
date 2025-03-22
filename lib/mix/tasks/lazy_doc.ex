@@ -18,12 +18,14 @@ defmodule Mix.Tasks.LazyDoc do
   @default_module_prompt ~s(You should describe what this module does based on the code given.\n\n Please do it in the following format given as an example, important do not return the code of the module, your output must be only the docs in the following format.\n\n@moduledoc """\n\nThe module GithubAi provides a way of communicating with Github AI API \(describes the main functionality of the module\).\n\n## Description\n\nIt implements the behavior Provider a standard way to use a provider in LazyDoc.\(gives a detailed description of what the module does\)\n"""\n\nModule to document:\n)
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc/run.md")
-  def run(_command_line_args) do
-    ## Start req
+  def run(args) do
+    Mix.Task.run("app.config")
+    main(args)
+  end
 
+  @doc false
+  def main(_args) do
     _result = Application.ensure_all_started([:req, :telemetry])
-
-    LazyDoc.Util.load_modules_and_conf()
 
     LazyDoc.Util.extract_data_from_files()
     |> proccess_files()

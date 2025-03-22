@@ -12,15 +12,17 @@ defmodule LazyDoc.CLI do
   def main(args) do
     Application.ensure_all_started([:lazy_doc, :logger, :req])
 
+    LazyDoc.Util.load_modules_and_conf()
+
     cond do
       Enum.empty?(args) ->
-        Mix.Tasks.LazyDoc.run(args)
+        Mix.Tasks.LazyDoc.main(args)
 
       args == ["--check"] or args == ["-c"] ->
-        Mix.Tasks.LazyDoc.Check.run(args)
+        Mix.Tasks.LazyDoc.Check.main(args)
 
       args == ["--clean"] or args == ["-r"] ->
-        Mix.Tasks.LazyDoc.Clean.run(args)
+        Mix.Tasks.LazyDoc.Clean.main(args)
 
       args == ["--help"] or args == ["-h"] ->
         help_message()
@@ -31,7 +33,8 @@ defmodule LazyDoc.CLI do
   end
 
   defp help_message() do
-    ## TO_DO: a proper error message.
-    Logger.info("mom is gae")
+    Logger.info(
+      "There are 3 options: \nuse it without any argument\n    it will document\n--check or -c\n    it will check if something is left to document\n--clean or -r\n    it will remove all the functions documentation"
+    )
   end
 end

@@ -17,9 +17,12 @@ defmodule Mix.Tasks.LazyDoc.Clean do
   use Mix.Task
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.clean/run.md")
-  def run(_command_line_args) do
-    LazyDoc.Util.load_modules_and_conf()
+  def run(args) do
+    Mix.Task.run("app.config")
+    main(args)
+  end
 
+  def main(_args) do
     if not clean_tree?() do
       IO.puts("Uncommitted changes detected.\nPlease stash your changes before running this task")
       exit({:shutdown, 1})
