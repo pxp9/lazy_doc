@@ -7,6 +7,7 @@ defmodule LazyDoc.Util do
 
   It implements functionality to scan Elixir source files within a specified path, extract module and function definitions, group related functions by name (taking arity into account), and filter undocumented or documented functions and modules. The primary purpose of LazyDoc is to facilitate the automation of generating documentation by analyzing source code, managing documentation for function overloads, and providing insights into which parts of the codebase are lacking documentation.
   """
+  require Logger
   @global_path "lib/**/*.ex"
 
   @doc File.read!("priv/lazy_doc/lazy_doc/extract_data_from_files.md")
@@ -330,5 +331,36 @@ defmodule LazyDoc.Util do
       fn {{:function, name, _arity}, _line, _signature, _docs, %{}} -> name end,
       fn {{:function, _name, _arity}, _line, _signature, docs, %{}} -> docs end
     )
+  end
+
+  def load_modules_and_conf() do
+    search_target = Path.wildcard("_build/dev/lib/**/ebin/")
+
+    if Enum.empty?(search_target) do
+      raise(
+        LazyDoc.Util.NotCompiledError,
+        message: "Your project must be compiled in dev mode in order to LazyDoc execute"
+      )
+    end
+
+    search_target
+    |> Enum.each(fn path ->
+      Logger.debug("Loading #{path}")
+      :code.add_path(String.to_charlist(path))
+    end)
+
+    if File.exists?("config/config.exs") do
+      Config.Reader.read!("config/config.exs")[:lazy_doc]
+      |> Enum.each(fn {k, v} -> Application.put_env(:lazy_doc, k, v) end)
+    end
+
+    if File.exists?("config/runtime.exs") do
+      Config.Reader.read!("config/runtime.exs")[:lazy_doc]
+      |> Enum.each(fn {k, v} -> Application.put_env(:lazy_doc, k, v) end)
+    end
+  end
+
+  defmodule NotCompiledError do
+    defexception [:message]
   end
 end

@@ -15,7 +15,7 @@ provider which is a tuple of three elements `{GithubAi, :codestral, options}`.
 ``` elixir
 def deps do
   [
-    {:lazy_doc, "~> 0.5.5"}
+    {:lazy_doc, "~> 0.5.6"}
   ]
 end
 ```
@@ -23,7 +23,7 @@ end
 or install it as a single binary
 
 ``` bash
-mix escript.install hex lazy_doc 0.5.5
+mix escript.install hex lazy_doc 0.5.6
 ```
 
 ## Configuration

@@ -23,6 +23,8 @@ defmodule Mix.Tasks.LazyDoc do
 
     _result = Application.ensure_all_started([:req, :telemetry])
 
+    LazyDoc.Util.load_modules_and_conf()
+    
     LazyDoc.Util.extract_data_from_files()
     |> proccess_files()
   end
@@ -162,6 +164,7 @@ defmodule Mix.Tasks.LazyDoc do
     end
 
     Enum.each(entries, fn entry ->
+      Logger.info("Documenting #{entry.file}")
       acc =
         Enum.reduce(entry.modules, entry.ast, fn {_mod, mod_ast, code_mod}, acc_ast ->
           function_prompt = final_module_prompt <> code_mod

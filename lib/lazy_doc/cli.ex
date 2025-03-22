@@ -7,34 +7,31 @@ defmodule LazyDoc.CLI do
 
   It serves as the entry point for running various tasks related to LazyDoc, such as generating documentation, checking documentation status, and cleaning up generated files. It also handles the inclusion of necessary ebin paths for modules and processes command-line arguments to determine which task to execute.
   """
+  require Logger
   @doc File.read!("priv/lazy_doc/lazy_doc/cli/main.md")
   def main(args) do
     Application.ensure_all_started([:lazy_doc, :logger, :req])
 
-    Path.wildcard("_build/dev/lib/**/ebin/")
-    |> Enum.each(fn path ->
-      :code.add_path(String.to_charlist(path))
-    end)
-
-    if File.exists?("config/config.exs") do
-      Config.Reader.read!("config/config.exs")[:lazy_doc]
-      |> Enum.each(fn {k, v} -> Application.put_env(:lazy_doc, k, v) end)
-    end
-
-    if File.exists?("config/runtime.exs") do
-      Config.Reader.read!("config/runtime.exs")[:lazy_doc]
-      |> Enum.each(fn {k, v} -> Application.put_env(:lazy_doc, k, v) end)
-    end
-
-    case args do
-      [] ->
+    cond do
+      Enum.empty?(args) ->
         Mix.Tasks.LazyDoc.run(args)
 
-      ["--check"] ->
+      args == ["--check"] or args == ["-c"] ->
         Mix.Tasks.LazyDoc.Check.run(args)
 
-      ["--clean"] ->
+      args == ["--clean"] or args == ["-r"] ->
         Mix.Tasks.LazyDoc.Clean.run(args)
+
+      args == ["--help"] or args == ["-h"] ->
+        help_message()
+
+      true ->
+        help_message()
     end
+  end
+
+  defp help_message() do
+    ## TO_DO: a proper error message.
+    Logger.info("mom is gae")
   end
 end
