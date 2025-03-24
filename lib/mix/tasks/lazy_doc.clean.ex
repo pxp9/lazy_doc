@@ -17,7 +17,14 @@ defmodule Mix.Tasks.LazyDoc.Clean do
   use Mix.Task
 
   @doc File.read!("priv/lazy_doc/mix/tasks/lazy_doc.clean/run.md")
-  def run(_command_line_args) do
+  def run(args) do
+    Mix.Task.run("app.config")
+    main(args)
+    exit({:shutdown, 0})
+  end
+
+  @doc false
+  def main(_args) do
     if not clean_tree?() do
       IO.puts("Uncommitted changes detected.\nPlease stash your changes before running this task")
       exit({:shutdown, 1})
@@ -25,6 +32,8 @@ defmodule Mix.Tasks.LazyDoc.Clean do
 
     LazyDoc.Util.extract_data_from_files()
     |> Enum.each(fn entry ->
+      Logger.info("Cleaning #{entry.file}")
+
       ast =
         Enum.reduce(entry.functions_documented, entry.ast, fn {_mod, mod_ast, functions}, acc ->
           delete_function_docs_from_ast(acc, functions, mod_ast)

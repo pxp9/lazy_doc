@@ -1,7 +1,7 @@
 defmodule LazyDoc.MixProject do
   use Mix.Project
 
-  @version "0.5.5"
+  @version "0.6.0"
 
   def project do
     [
@@ -27,7 +27,6 @@ defmodule LazyDoc.MixProject do
       ],
       dialyzer: [
         check_plt: true,
-        plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
         plt_add_apps: [:ex_unit, :mix]
       ]
     ]
