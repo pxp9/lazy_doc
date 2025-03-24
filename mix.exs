@@ -1,7 +1,7 @@
 defmodule LazyDoc.MixProject do
   use Mix.Project
 
-  @version "0.6.1"
+  @version "0.6.2"
 
   def project do
     [
@@ -53,7 +53,7 @@ defmodule LazyDoc.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :req, :jason, :mix]
+      extra_applications: [:logger, :req, :jason, :mix, :eex]
     ]
   end
 
