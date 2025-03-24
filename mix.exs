@@ -27,7 +27,6 @@ defmodule LazyDoc.MixProject do
       ],
       dialyzer: [
         check_plt: true,
-        plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
         plt_add_apps: [:ex_unit, :mix]
       ]
     ]
