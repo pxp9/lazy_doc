@@ -46,8 +46,21 @@ defmodule Mix.Tasks.LazyDoc do
   def write_to_file_formatted(file, compile_path, ast, comments) do
     dot_formatter = Application.get_env(:lazy_doc, :file_formatter, ".formatter.exs")
 
+    deps_paths =
+      Path.wildcard("./deps/*/lib")
+      |> Enum.map(fn path -> String.replace(path, "/lib", "") end)
+      |> Enum.filter(fn path -> File.dir?(path) end)
+      |> Enum.map(fn path -> String.split(path, "/") end)
+      |> Enum.map(fn ["deps", dep] = list ->
+        {String.to_atom(dep), Path.join(list) |> Path.absname()}
+      end)
+      |> Map.new()
+
     {_func, formatter} =
-      Mix.Tasks.Format.formatter_for_file(file, dot_formatter: dot_formatter)
+      Mix.Tasks.Format.formatter_for_file(file,
+        dot_formatter: dot_formatter,
+        deps_paths: deps_paths
+      )
 
     line_length = Keyword.get(formatter, :line_length, 98)
     locals_without_parens = Keyword.get(formatter, :locals_without_parens, [])

@@ -8,7 +8,7 @@ defmodule LazyDoc.MixProject do
       app: :lazy_doc,
       version: @version,
       escript: escript(),
-      elixir: "~> 1.17",
+      elixir: "~> 1.18",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
